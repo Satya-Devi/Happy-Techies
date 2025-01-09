@@ -1,8 +1,10 @@
 import DedicationSection from "@/components/DedicationSection/DedicationSection";
 import ExploreSolutionAreas from "@/components/ExploreSolutionAreas/ExploreSolutionAreas";
 import { Hero } from "@/components/Hero/Hero";
+import Dashboard from "@/components/Dashboard/Dashboard";
 import { redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
+import Draft from "@/components/DraftSection/Draft";
 
 export default async function Overview() {
   const supabase = createClient();
@@ -26,7 +28,7 @@ export default async function Overview() {
     redirect("/employers-login");
   }
   return (
-    <>
+    <div>
       <Hero
         title=""
         role="Employer"
@@ -35,16 +37,8 @@ export default async function Overview() {
         page="overview"
         isHome
       />
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100vh",
-        }}
-      >
-        <h1>Dashboard</h1>
-      </div>
-    </>
+      <Dashboard />
+      <Draft />
+    </div>
   );
 }
