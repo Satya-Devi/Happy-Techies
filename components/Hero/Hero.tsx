@@ -59,7 +59,26 @@ export function Hero({
         (role === "Employer" ? (
           <div className={classes.header}>
             <div className={classes.backButtonContainer}>
-              <BackButton BackButtonStyles={backButtonStyles} role="Employer" />
+              {page && (page == "my-jobs") ? (
+                <div
+                  style={{
+                    fill: "#004A93",
+                    color: "transparent",
+                    cursor: "pointer",
+                    width: "48px",
+                    height: "48px",
+                    marginLeft: "20px",
+                    border: "none",
+                    padding: "0",
+                    backgroundColor: "transparent",
+                  }}
+                ></div>
+              ) : (
+                <BackButton
+                  BackButtonStyles={backButtonStyles}
+                  role="Employer"
+                />
+              )}
             </div>
             <div className={classes.empinner}>
               {isPartner ? (

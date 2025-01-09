@@ -17,7 +17,8 @@ import {
   TagsInput,
 } from "@mantine/core";
 import { DateInput } from "@mantine/dates";
-import { redirect } from "next/navigation";
+import { redirect ,useRouter} from "next/navigation";
+
 import * as Yup from "yup";
 
 // Validation Schema using Yup
@@ -55,11 +56,11 @@ const PaymentForm = () =>
       cvc: "",
       country: "",
     });
+ 
+  const [warningModal, setWarningModal] = useState(false);
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
-    const [isModalOpen, setModalOpen] = useState(false);
-    const [modalTitle, setModalTitle] = useState("");
     const [modalMessage, setModalMessage] = useState("");
-
+    const router=useRouter()
     const handleInputChange = (key: string, value: any) => {
       console.log("handle", key, value, formData);
       setFormData((prev) => ({ ...prev, [key]: value }));
@@ -388,17 +389,21 @@ const PaymentForm = () =>
                 gap: "16px", // Space between buttons
               }}
             >
+              
               <Button
+               onClick={() => router.push("/post-job")}
                 type="submit"
                 size="md"
                 style={{
-                  backgroundColor: "#004A93", // Correct property name
-                  color: "white",
+                  border: "2px solid #004A93", // Correct property name
+                  backgroundColor: "#F7FAFC", // Correct property name
+                  color: "#004A93",
                 }}
               >
-                Save Draft
+                Cancel
               </Button>
               <Button
+              onClick={() => setWarningModal(true)}
                 type="submit"
                 size="md"
                 style={{
@@ -406,7 +411,7 @@ const PaymentForm = () =>
                   color: "white",
                 }}
               >
-                Make Payment
+                Continue
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
@@ -426,6 +431,39 @@ const PaymentForm = () =>
                   <polyline points="12 8 16 12 12 16" />
                 </svg>
               </Button>
+              <Modal
+                        opened={warningModal}
+                        onClose={() => setWarningModal(false)}
+                        centered
+                        size="lg"
+                      >
+                        <Box ml={40} mr={40} mb={40}>
+                          <Title
+                            ta="left"
+                            order={1}
+                            className={SFProRounded.className}
+                            c="blue"
+                            mb={10}
+                          >
+                            Success
+                            {/* {searchParams?.message && searchParams.message == "Success" ? "Success!" : "Fail!"} */}
+                          </Title>
+                          <Text className={SFProRounded.className} c="dark" size="md">
+                            {/* {searchParams?.message && searchParams.message == "Fail"?"Somthing went wrong Please try again!": ModalText?.length?ModalText:"The form has been submitted successfully!"} */}
+                            Your job listing request has been submitted and is pending for approval. You will be notified via email when the job goes live.
+                          </Text>
+                          <Button
+                            style={buttonStyle}
+                            onClick={() => {
+                              setWarningModal(false);
+                              router.push("/my-jobs");
+                            }}
+                            mt="md"
+                          >
+                            OK
+                          </Button>
+                        </Box>
+                      </Modal>
             </Group>
           </div>
         </div>

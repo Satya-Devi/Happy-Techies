@@ -106,21 +106,46 @@ const validationSchema = Yup.object().shape({
     ),
   workplaceType: Yup.string().required("Workplace type is required"),
   salaryMin: Yup.number()
+  .nullable()
     .transform((value, originalValue) =>
       originalValue.trim() === "" ? undefined : Number(originalValue)
     )
-    .required("Salary range is required")
+    // .required("Salary range is required")
     .min(1, "Minimum salary must be greater than 0"),
   salaryMax: Yup.number()
+  .nullable()
     .transform((value, originalValue) =>
       originalValue.trim() === "" ? undefined : Number(originalValue)
     )
-    .required("Salary range is required")
+    // .required("Salary range is required")
+    // .test(
+    //   "max-salary-test",
+    //   "Maximum salary must be greater than minimum salary",
+    //   function (value) {
+    //     const { salaryMin } = this.parent;
+    //     console.log("Current max value:", value);
+    //     console.log("Current min value:", salaryMin);
+    //     console.log(
+    //       "Parent object:",
+    //       this.parent,
+    //       Number(value),
+    //       Number(salaryMin),
+    //       Number(value) >= Number(salaryMin)
+    //     );
+    //     return Number(value) >= Number(salaryMin);
+    //   }
+    // ),
     .test(
       "max-salary-test",
       "Maximum salary must be greater than minimum salary",
       function (value) {
         const { salaryMin } = this.parent;
+        
+        // Only validate if salaryMin has a value
+        if (!salaryMin) {
+          return true;
+        }
+    
         console.log("Current max value:", value);
         console.log("Current min value:", salaryMin);
         console.log(
@@ -130,10 +155,11 @@ const validationSchema = Yup.object().shape({
           Number(salaryMin),
           Number(value) >= Number(salaryMin)
         );
+    
         return Number(value) >= Number(salaryMin);
       }
     ),
-  experience: Yup.number()
+    experience: Yup.number()
     .required("Years of experience is required")
     .typeError("Years of experience is required")
     .min(0, "Experience must be at least 0 years"),
@@ -643,7 +669,7 @@ const EditJobForm = ({ searchParams, onSubmit, data }: Props) => {
                     marginBottom: "0.5rem",
                   }}
                 >
-                  Salary Range (Annual)*
+                  Salary Range (Annual)
                 </label>
                 <div
                   style={{
@@ -689,6 +715,16 @@ const EditJobForm = ({ searchParams, onSubmit, data }: Props) => {
                       //     }
                       //   />
                       // }
+                      rightSection={
+                        <div
+                          style={{
+                            fontSize: "16px",
+                            fontWeight: 600,
+                          }}
+                        >
+                          $
+                        </div>
+                      }
                       styles={{
                         ...inputStyles,
                         input: {
@@ -737,6 +773,16 @@ const EditJobForm = ({ searchParams, onSubmit, data }: Props) => {
                       // }
                       onChange={(e) =>
                         handleInputChange("salaryMax", e.target.value)
+                      }
+                      rightSection={
+                        <div
+                          style={{
+                            fontSize: "16px",
+                            fontWeight: 600,
+                          }}
+                        >
+                          $
+                        </div>
                       }
                       styles={{
                         ...inputStyles,

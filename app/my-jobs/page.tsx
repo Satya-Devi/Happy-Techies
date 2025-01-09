@@ -9,6 +9,10 @@ export default async function PostJob({
   searchParams: { [key: string]: string };
 }) {
   const supabase = createClient();
+  const listData ={
+    count: 0,
+    step:1,
+  }
   const userdata = await supabase.auth.getUser();
   console.log("User: ", userdata?.data?.user?.id);
   if (userdata?.data?.user?.id) {
@@ -29,53 +33,85 @@ export default async function PostJob({
     redirect("/employers-login");
   }
 
-  const { data, error } = await supabase
-    .from("jobs")
-    .select("*")
-    .eq("employer_id", userdata?.data?.user?.id) // Match employer_id
-    //.eq("id", "4b60e2db-637b-4580-a14f-1f984a097a83") // Match id
-    //  2e13eb5c-f88a-42ab-9262-5538d11ca315
-    .neq("is_draft", true); // Exclude rows where isDraft is true
-
-  if (error) {
-    console.error("Error fetching data:", error);
+  const { data:countData, count, error:countErr } = await supabase
+  .from("jobs")
+  .select("*", { count: "exact" })
+  .eq("employer_id", userdata?.data?.user?.id) 
+  .neq("is_draft", true);
+  if (countErr) {
+    console.error("Error fetching data:", countErr);
   } else {
-    console.log("Fetched data:", data);
+   
+    console.log("Fetched data$$$$$$$$$$$$$$$$:", countData);
   }
-  const signUp = async (formData: any) => {
-    "use server";
-    console.log("formData", formData);
-    let formattedDate = null;
-    if (formData?.deadline) {
-      const date = new Date(formData?.deadline);
-      formattedDate = date.toISOString().split("T")[0];
-    }
-    const supabase = createClient();
-    const { data, error } = await supabase
-      .from("jobs")
-      .select("*")
-      // .eq("employer_id", data1?.data?.user?.id) // Match employer_id
-      .eq("id", "4b60e2db-637b-4580-a14f-1f984a097a83") // Match id
-      //  2e13eb5c-f88a-42ab-9262-5538d11ca315
-      .neq("is_draft", true); // Exclude rows where isDraft is true
+  const limit = 20; // Number of rows per page
+  const start = 0;
+  const end = start + limit - 1;
+const { data, error } = await supabase
+  .from("jobs")
+  .select("*")
+  .eq("employer_id", userdata?.data?.user?.id)
+  .neq("is_draft", true)
+  .order("created_at", { ascending: false }) // Ensure latest records first
+  .range(start, end);
+
 
     if (error) {
       console.error("Error fetching data:", error);
     } else {
+     
+      console.log("Fetched data%%%%%%%%%%%%%%%%%%%%%%%:", data);
+    }
+  const signUp = async (formData: any) => {
+    "use server";
+    console.log("formData", formData);
+    
+const supabase = createClient();
+const dynamicOffset = formData?.step || 1;
+const limit = 20; // Number of rows per page
+const start = (dynamicOffset - 1) * limit;
+const end = start + limit - 1;
+const { data:countData, count, error:countErr } = await supabase
+  .from("jobs")
+  .select("*", { count: "exact" })
+  .eq("employer_id", userdata?.data?.user?.id) 
+  .neq("is_draft", true);
+  if (countErr) {
+    console.error("Error fetching data:", countErr);
+  } else {
+   
+    console.log("Fetched data  counttttttt:", countData);
+  }
+
+const { data, error } = await supabase
+  .from("jobs")
+  .select("*")
+  .eq("employer_id", userdata?.data?.user?.id)
+  .neq("is_draft", true)
+  .order("created_at", { ascending: false }) // Ensure latest records first
+  .range(start, end);
+
+
+    if (error) {
+      console.error("Error fetching data:", error);
+    } else {
+     
       console.log("Fetched data:", data);
     }
+    
   };
+ 
   return (
     <div>
       <Hero
-        title="Create a Job Listing"
+        title="My Posted Jobs"
         subtitle=""
         align="center"
-        role="Employer"
+        role="Employer" 
         page="my-jobs"
       />
 
-      <MyJobs searchParams={searchParams} onSubmit={signUp} data={data} />
+      <MyJobs searchParams={searchParams} onSubmit={signUp} data={data} count={count || 0} />
     </div>
   );
 }
