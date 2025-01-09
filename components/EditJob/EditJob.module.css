@@ -1,0 +1,40 @@
+.inner {
+  position: relative;
+  z-index: 1;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  margin-bottom: var(--mantine-spacing-xl);
+}
+
+.empTitle {
+  text-align: left;
+  font-weight: 600;
+  font-size: 56px;
+  line-height: 1.2;
+  color: #004a93;
+  margin-bottom: var(--mantine-spacing-xs);
+  max-width: 100%;
+  overflow-wrap: break-word;
+  white-space: normal;
+
+  @media (max-width: 768px) {
+    font-size: 36px;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 24px;
+    text-align: center;
+  }
+}
+
+@media (max-width: 768px) {
+  .header {
+    justify-content: center;
+    gap: 10px;
+  }
+}

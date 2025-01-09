@@ -1,0 +1,13 @@
+.titleStyles {
+  font-size: 48px;
+  font-weight: 600;
+  line-height: 57.6px;
+  text-align: "left";
+  color: "#004A93";
+}
+
+@media (min-width: 375px) and (max-width: 768px) {
+    .titleStyles {
+        margin-left: "30px";
+      }
+}

@@ -1,0 +1,10 @@
+.blog_detail_section  img{
+    max-width: 100% !important;
+    height: auto !important;
+    margin: auto;
+    display: block;
+}
+
+.blog_detail_section{
+    word-wrap: break-word !important;
+}

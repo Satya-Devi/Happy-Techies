@@ -1,0 +1,25 @@
+.container {
+    display: flex; 
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .container::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .container {
+    scrollbar-width: none;
+  }
+
+  .button{
+    flex-shrink: 0;
+    color: #004A93;
+    border-color:#004A93 ;
+  }
+
+  .active{
+    color: #fff;
+    border: none;
+  }

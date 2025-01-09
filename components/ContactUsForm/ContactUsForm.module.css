@@ -1,0 +1,18 @@
+.getTouchContainer {
+  top: -160px;
+  position: relative;
+}
+
+.headerText {
+  margin-left: 50px;
+  margin-top: -50px;
+  margin-bottom: 40px;
+}
+
+@media (min-width: 375px) and (max-width: 768px) {
+  /* Add mobile-specific styles here */
+  .getTouchContainer {
+    top: 0px;
+    /* position: relative; */
+  }
+}

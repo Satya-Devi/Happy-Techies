@@ -1,0 +1,81 @@
+.container{
+    /* background: radial-gradient(50.76% 134.05% at 50% 100%, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 100%),linear-gradient(180deg, #0281FF 0%, #3BADFF 100%); */
+    background-image: url(/images/hero/app_hero.png);
+    padding: 40px 40px;
+    background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+    border-radius: 10px;
+    margin-inline: 2rem;
+    overflow-x: hidden;
+    @media (max-width: 576px) {
+      font-size: rem(30px);
+      line-height: 35px;
+      padding: 10px 10px;
+      margin-inline: 0.625rem;
+    }
+}
+
+.title {
+  font-size: rem(61px);
+  font-weight: 700;
+  line-height: 73.2px;
+  color: #fff;
+  text-align: left;
+    @media (max-width: 576px) {
+      font-size: rem(30px);
+      line-height: 35px;
+    };
+    @media (min-width: 1200px) and (max-width: 1440px) {
+      font-size: rem(46px);
+      /* line-height: 35px; */
+    };
+    @media (min-width: 1024px) and (max-width: 1200px) {
+      font-size: rem(38px);
+      line-height: 60px;
+    };
+    @media (min-width: 768px) and (max-width: 1024px) {
+      font-size: rem(35px);
+      line-height: 50px;
+    };
+  }
+
+.about {
+  font-size: 48px;
+  font-weight: 800;
+  @media (max-width: 576px) {
+    font-size: rem(25px);
+    line-height: rem(30px);
+  };
+  @media (min-width: 1200px) and (max-width: 1440px) {
+    font-size: rem(46px);
+    /* line-height: 35px; */
+  };
+  @media (min-width: 1024px) and (max-width: 1200px) {
+    font-size: rem(38px);
+    line-height: rem(40px);
+  };
+  @media (min-width: 768px) and (max-width: 1024px) {
+    font-size: rem(35px);
+    line-height: rem(40px);
+  };
+}
+
+.absoluteImage {
+  position: absolute;
+  top: -30%;
+  right: 8%;
+  @media (max-width: 768px) {
+    display: none;
+  };
+  @media (max-width: 1440px) {
+    position: absolute;
+    top: -20%;
+    right: 0%;
+  }
+  @media (max-width: 1024px) {
+    position: absolute;
+    top: 0%;
+    right: 0%;
+  }
+}

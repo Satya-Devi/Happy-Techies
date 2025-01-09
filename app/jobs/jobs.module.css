@@ -1,0 +1,16 @@
+.container{
+    margin-left: 25px
+}
+
+.TitleHeader {
+    font-size: 42px;
+}
+
+@media (max-width: 450px) {
+    .container{
+        margin-left: 0px
+    }
+    .TitleHeader {
+        font-size: 32px;
+    }
+}

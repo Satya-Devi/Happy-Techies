@@ -1,0 +1,68 @@
+.container{
+  margin-inline: 2rem;
+  padding: 30px 30px 0;
+  padding-top: 40px !important;
+  @media (max-width: $mantine-breakpoint-xs) {
+    font-size: rem(30px);
+    line-height: 35px;
+    margin-inline: 0.625rem;
+    padding:  20px 10px 0;
+}
+}
+.title {
+  font-size: rem(40px);
+  font-weight: 700;
+  line-height: 73.2px;
+  color: #fff;
+  text-align: left;
+    @media (max-width: $mantine-breakpoint-xs) {
+      font-size: rem(30px);
+      line-height: 35px;
+  }
+  font-size: rem(40px);
+  font-weight: 700;
+  line-height: 73.2px;
+  color: #fff;
+  text-align: left;
+    @media (max-width: $mantine-breakpoint-xs) {
+      font-size: rem(30px);
+      line-height: 35px;
+  }
+}
+
+.subtitle {
+  font-size: 24px;
+  font-weight: 500;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: 1.6;
+  letter-spacing: -0.32px;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.button {
+  font-size: 16px;
+  font-weight: 500;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: 1.6;
+  letter-spacing: -0.32px;
+  text-align: left;
+  color: #004a93;
+}
+
+.card_wrapper{
+  flex-wrap: wrap;
+  flex-direction: row;
+  margin: 1rem;
+  width: 100%;
+  height: max-content;
+  padding: 3rem auto;
+  min-height: 200px;
+  margin-top: 4rem;
+  display: block;
+  @media (max-width: $mantine-breakpoint-xs) {
+    display: none;
+}
+}

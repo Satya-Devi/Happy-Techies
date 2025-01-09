@@ -1,0 +1,38 @@
+.slick-list {
+    padding: 0 !important;  /* Resets the padding of the slick list */
+}
+  
+.slick-slide {
+  padding: 0 !important;  /* Resets the padding of each slick slide */
+}
+
+
+ ::-webkit-scrollbar {
+  width: 7px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 5px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+.scrollbar_hidden {
+  overflow-x: auto;
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+.scrollbar_hidden::-webkit-scrollbar {
+  display: none; /* Chrome, Safari and Opera */
+}

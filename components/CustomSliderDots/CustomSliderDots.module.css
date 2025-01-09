@@ -1,0 +1,23 @@
+/* components/CustomSliderDots.module.css */
+.dotsContainer {
+    display: flex;
+    justify-content: center;
+    padding: 0; /* Remove default padding */
+    margin: 10px 0px; /* Remove default margin */
+    list-style: none; /* Remove default list styling */
+    gap: 25px; /* Increased gap between dots */
+  }
+  
+  .dot {
+    width: 6px; /* Smaller dot size */
+    height: 6px; /* Smaller dot size */
+    border-radius: 50%;
+    background-color: #36454F80; /* Default dot color */
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .dot.active {
+    background-color: #000; /* Active dot color */
+  }
+  

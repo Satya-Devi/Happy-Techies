@@ -1,0 +1,13 @@
+.saveJob {
+    margin-left: 40px;
+    @media (max-width: 450px) {
+        margin-left: 10px;
+    }
+}
+
+.jobCard {
+    margin-left: 30px;
+    @media (max-width: 450px) {
+        margin-left: 0px;
+    }
+}

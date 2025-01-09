@@ -1,0 +1,45 @@
+.title {
+  font-weight: 600;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: 1.2;
+  letter-spacing: -1px;
+  text-align: center;
+  color: rgba(10, 26, 41, 0.8);
+}
+
+.text {
+  font-weight: 500;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: 1.6;
+  letter-spacing: normal;
+  text-align: center;
+  color: rgba(10, 26, 41, 0.8);
+}
+
+.subtitle {
+  font-size: 16px;
+  font-weight: 500;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: 1.6;
+  letter-spacing: -0.32px;
+  text-align: center;
+  color: #0a1a29cc;
+}
+
+.iconWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+}
+
+.icon {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  opacity: 0.11;
+  transition: opacity 0.3s ease;
+}

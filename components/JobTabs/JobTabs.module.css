@@ -1,0 +1,20 @@
+.container{
+margin-bottom: 20px;
+display: flex;
+}
+
+.tabs{
+    padding: 10px 50px;
+    border-radius: 0px;
+    height: max-content;
+    color: #004A93;
+    @media (max-width: $mantine-breakpoint-xs) {
+        padding: 10px;
+        width: 100%;
+     }
+
+}
+
+.active{
+    border-bottom: 2px solid #004A93;
+}

@@ -1,0 +1,220 @@
+.footer {
+  width: 100%;
+  padding: 80px 20px 16px;
+  background-color: #fff;
+  margin-top: 25px;
+}
+
+.wrapper {
+  max-width: 1241px;
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+   align-items: center; 
+}
+
+.happyTechies {
+  width: auto;
+  min-width: 177px;
+  max-width: 100%;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+
+.text {
+  font-size: 16px;
+  color: #727272;
+}
+
+.menuGroup {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 48px;
+  justify-content: space-between;
+  max-width: 937px;
+}
+
+.rowGroup {
+  display: flex;
+  gap: 75px;
+}
+
+.column {
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.heading {
+  color: #170f49;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.link {
+  color: #727272;
+  text-decoration: none;
+  font-size: 16px;
+}
+
+
+.link:hover {
+  text-decoration: underline;
+}
+
+.socialIcons {
+  display: flex;
+  width: auto;
+  height: auto;
+  display: flex;
+  gap: 22px;
+  justify-content: center;
+}
+
+.socialLink {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* width: 40px;
+  height: 40px;
+  background-color: #004a93;
+  border-radius: 50%;
+  transition: background-color 0.3s ease; */
+}
+
+/* .socialLink:hover {
+  background-color: #003a75;
+} */
+
+.socialIcon {
+  color: #003a75;
+}
+
+.contactInfo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dividerLine {
+  width: 1241px;
+  height: 0px;
+  border-top: 1px solid #d9dbe9;
+  margin: 20px auto;
+}
+
+.copyrightWrapper {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 40px;
+}
+
+.copyright {
+  color: #727272;
+  font-size: 18px;
+  margin-right: -10px;
+}
+
+.bluelinkPrivacy {
+  color: #004a93;
+  font-size: 18px;
+  text-decoration: none;
+  margin: 0 4px;
+  margin-left: -8px;
+}
+
+.bluelinkTerms {
+  color: #004a93;
+  font-size: 18px;
+  text-decoration: none;
+  margin: 0 4px;
+}
+
+.copyrightBlock {
+  display: flex; 
+  flex-direction: row; 
+  align-items: center; 
+  justify-content: center;
+}
+
+.separator {
+  margin: 0 4px; 
+}
+
+
+@media (max-width: 768px) {
+  .wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .menuGroup {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .column {
+    width: 100%;
+    flex-direction: column;
+    align-items: center; 
+  text-align: center;
+  }
+
+  .rowGroup {
+    width: 100%;
+    flex-direction: column;
+    align-items: center; 
+    gap: 40px;
+  }
+  
+
+  .happyTechies {
+    margin-bottom: 40px;
+    text-align: center;
+  }
+
+  .dividerLine {
+    width: 100%;
+  }
+
+  .copyrightWrapper {
+    flex-direction: column;
+    text-align: center;
+    margin-top: 20px;
+  }
+  .copyrightBlock {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  .linkRow {
+    justify-content: center;     
+    text-align: center;  
+    flex-direction: row; 
+  }
+  .separator {
+    opacity: 0;
+    margin-inline: 2px;
+  }
+  .contactInfo {
+    flex-direction: row; 
+    flex-wrap: wrap;
+  }
+  .contactInfo a,
+  .contactInfo Text {
+    flex: 1; 
+    min-width: 0;
+    overflow-wrap: break-word; 
+  }
+}

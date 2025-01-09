@@ -1,0 +1,13 @@
+.container{
+margin-left: 10px;
+-webkit-overflow-scrolling: touch;
+}
+
+.container::-webkit-scrollbar {
+    display: none !important;
+}
+  
+.selected{
+    background-color: #1D96FF;
+    color: #fff;
+}

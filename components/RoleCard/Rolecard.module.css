@@ -1,0 +1,53 @@
+.card {
+    transition: transform 0.3s;
+    cursor: pointer;
+    margin: 16px 0; 
+    align-self: left;
+    height: auto;
+    padding: 20px;
+  }
+  
+  .card:hover {
+    transform: translateY(-4px);
+  }
+
+  .title {
+    height: auto;
+  }
+  
+  .badgeContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .categoryBadge {
+    margin-bottom: 8px; /* Space between badge and job count */
+  }
+  
+  .jobCountContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: auto;
+    height: auto;
+    /* background-color: #FFCFCC; */
+    padding: 5px;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .card {
+      padding: 12px; 
+      align-items: right;
+      /* margin-left: -70px; */
+      height: auto;
+    }
+  
+    .jobCountContainer {
+      font-size: 12px; 
+    }
+    .title {
+        height: auto;
+      }
+  }

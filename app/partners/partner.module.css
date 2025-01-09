@@ -1,0 +1,13 @@
+.container {
+    margin-left: 30px;
+    @media (max-width: 430px) {
+        margin-left: 0px
+    }
+}
+
+.container_detail {
+    margin-left: 15px;
+    @media (max-width: 430px) {
+        margin-left: 0px
+    }
+}

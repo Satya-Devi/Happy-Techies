@@ -1,0 +1,4 @@
+.datePickerInput {
+  width: 100%; /* Ensures input full width */
+  padding-right: 30px; /* Adjust padding to ensure arrow icon doesn't expand input width */
+}

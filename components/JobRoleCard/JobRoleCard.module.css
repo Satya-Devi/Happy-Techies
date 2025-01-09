@@ -1,0 +1,55 @@
+.container{
+    width: 12.5rem;
+    height: 9.375rem;
+    border-radius: 12px;
+    padding: 1.36rem 1.21rem;
+    border: 1px solid #e0e0e0;
+    position: relative;
+    transition: all 0.3s ease;
+    box-shadow: 0px 2.08px 1.66px 0px #00000005, 0px 4.99px 3.99px 0px #00000007, 
+    0px 9.39px 7.51px 0px #00000009, 0px 16.75px 13.4px 0px #0000000B,
+    0px 31.33px 25.07px 0px #0000000D, 0px 75px 60px 0px #00000012;
+    cursor: pointer;
+    @media (max-width: $mantine-breakpoint-xs) {
+        width: 7.5rem !important;
+        height:8rem;
+        padding-top: 18px;
+    }
+}
+
+
+.circle{
+    width: 2.34rem;
+    height: 2.34rem;
+    border-radius: 100%;
+    background-size: contain !important;
+    @media (max-width: $mantine-breakpoint-xs) {
+        width: rem(18px);
+        height: rem(18px);
+
+    }
+}
+
+.active{
+    top: -25px !important;
+    box-shadow: -3px 4px 2px 0px #FF964F,0px -4px 2px 0px #FF964F;
+    @media (max-width: $mantine-breakpoint-xs) {
+        /* box-shadow: -0.75px 1.01px 0.5px 0px #04D9FF,0px -1.01px 0.5px 0px #04D9FF;     */
+    }
+}
+
+.text{
+    margin-top: 0.62rem;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 21.6px;
+    text-align: left;
+    font-weight: 800;
+    @media (max-width: $mantine-breakpoint-xs) {
+       font-size: 12px;
+       margin-top: 0.6rem !important;
+       line-height: 16px;
+       font-weight: 500;
+    }
+}
+

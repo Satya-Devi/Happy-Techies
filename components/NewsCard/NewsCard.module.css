@@ -1,0 +1,48 @@
+.card{
+   padding: 0px;
+   border-radius: 1rem;
+   margin: 1rem;
+   width: 300px;
+   flex: 1;
+   height: 450px;
+   cursor: pointer;
+   @media (max-width: $mantine-breakpoint-xs) {
+      margin:1rem auto;
+   }
+   }
+    
+   .stack{
+       padding: 1rem;
+       padding-top: 2rem;
+       gap: 8px;
+   }
+    
+   .date{
+       font-size: 13px;
+       font-weight: 600;
+       line-height: 18.2px;
+       letter-spacing: 0.05em;
+       text-align: left;
+       color: #060606;
+   }
+    
+   .title{
+       font-size: 21px;
+       font-weight: 600;
+       line-height: 25px;
+       letter-spacing: -0.03em;
+       overflow: hidden;
+       width: 100%;
+       display: -webkit-box;
+       -webkit-line-clamp: 3;
+       -webkit-box-orient: vertical;
+   }
+    
+   .description{
+       font-size: 16px;
+       font-weight: 500;
+       line-height: 25.6px;
+       letter-spacing: -0.02em;
+       text-align: left;
+      color: #000000B2
+   }

@@ -1,0 +1,46 @@
+.card {
+  background-color: light-dark(
+    var(--mantine-color-white),
+    var(--mantine-color-dark-7)
+  );
+  border: solid 1px #dbedff;
+  position: relative;
+}
+
+.buttonGroup {
+  right: 10px;
+  top: 10px;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.card:hover {
+  box-shadow: 0 4.4px 4px 0 rgba(0, 35, 68, 0.01),
+    0 10.2px 9.3px 0 rgba(0, 35, 68, 0.02),
+    0 18.3px 16.6px 0 rgba(0, 35, 68, 0.02),
+    0 30.3px 27.6px 0 rgba(0, 35, 68, 0.03),
+    0 50px 45.5px 0 rgba(0, 35, 68, 0.03),
+    0 87.4px 79.5px 0 rgba(0, 35, 68, 0.04),
+    0 189px 172px 0 rgba(0, 35, 68, 0.05);
+  transition: box-shadow 0.3s ease;
+}
+
+.card:hover .buttonGroup {
+  opacity: 1;
+}
+
+.section {
+  border-bottom: rem(1px) solid
+    light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
+  padding-left: var(--mantine-spacing-md);
+  padding-right: var(--mantine-spacing-md);
+  padding-bottom: var(--mantine-spacing-md);
+}
+
+.label {
+  text-transform: uppercase;
+  font-size: var(--mantine-font-size-xs);
+  font-weight: 700;
+}
