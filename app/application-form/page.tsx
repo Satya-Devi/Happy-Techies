@@ -1,15 +1,17 @@
-import DedicationSection from "@/components/DedicationSection/DedicationSection";
-import ExploreSolutionAreas from "@/components/ExploreSolutionAreas/ExploreSolutionAreas";
 import { Hero } from "@/components/Hero/Hero";
-import { redirect } from "next/navigation";
+import ApplicantForm from "@/components/ApplicantForm/ApplicantForm";
 import { createClient } from "@/utils/supabase/server";
-import Dashboard from "@/components/Dashboard/Dashboard";
-import Draft from "@/components/DraftSection/Draft";
+import { fetchJobById } from "@/app/post-job/action";
+import { redirect } from "next/navigation";
 
-
-export default async function Overview() {
+export default async function PostJob({
+  searchParams,
+}: {
+  searchParams: { [key: string]: string };
+}) {
   const supabase = createClient();
   const data = await supabase.auth.getUser();
+  console.log("User: ", data?.data?.user?.id);
   if (data?.data?.user?.id) {
     const { data: empData, error: empError } = await supabase
       .from("employer_details")
@@ -28,21 +30,23 @@ export default async function Overview() {
   } else {
     redirect("/employers-login");
   }
+
   return (
-    <>
+    <div>
       <Hero
-        title=""
-        role="Employer"
+        title="Candidate Profile"
         subtitle=""
         align="center"
-        page="overview"
-        isHome
+        role="Employer"
+        page="post-job"
       />
-      <div>
-      
-      <Dashboard />
-      <Draft />
+
+      <ApplicantForm
+      />
     </div>
-    </>
-  );
-}
+  );}
+
+
+
+
+

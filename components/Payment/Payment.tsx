@@ -41,8 +41,12 @@ const validationSchema = Yup.object().shape({
     .required("CVC is required"),
   country: Yup.string().required("Country is required"),
 });
+interface PaymentFormProps {
+  setShowPayment: (show: boolean) => void;
+  handleSubmit: (data: any) => void;
+}
+const PaymentForm = ({ setShowPayment ,handleSubmit}: PaymentFormProps) =>
 
-const PaymentForm = () =>
   // { onSubmit }: { onSubmit: (data: any) => void }
   {
     const [formData, setFormData] = useState({
@@ -65,7 +69,11 @@ const PaymentForm = () =>
       console.log("handle", key, value, formData);
       setFormData((prev) => ({ ...prev, [key]: value }));
     };
-
+const handleContinue=()=>{
+  handleSubmit({});
+   setWarningModal(true);
+   
+}
     const validateForm = async (): Promise<boolean> => {
       try {
         // Filter out fields with no data before validation
@@ -391,7 +399,8 @@ const PaymentForm = () =>
             >
               
               <Button
-               onClick={() => router.push("/post-job")}
+              // onClick={() => router.push("/post-job")}
+               onClick={() => setShowPayment(false)}
                 type="submit"
                 size="md"
                 style={{
@@ -403,7 +412,7 @@ const PaymentForm = () =>
                 Cancel
               </Button>
               <Button
-              onClick={() => setWarningModal(true)}
+              onClick={() => handleContinue()}
                 type="submit"
                 size="md"
                 style={{

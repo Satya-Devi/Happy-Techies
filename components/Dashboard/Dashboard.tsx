@@ -4,12 +4,16 @@ import { redirect } from "next/navigation";
 import { ViewAllButton } from "./ViewAllButton";
 import MyJobs from "../MyJobs";
 import { Container, Text, Box } from "@mantine/core";
+import { fetchJobsData} from "@/app/my-jobs/action";
 
-export default async function Dashboard({
-  searchParams,
-}: {
-  searchParams: { [key: string]: string };
-}) {
+
+export default async function Dashboard(
+//   {
+//   searchParams,
+// }: {
+//   searchParams: { [key: string]: string };
+// }
+) {
   const supabase = createClient();
   const userdata = await supabase.auth.getUser();
   console.log("User: ", userdata?.data?.user?.id);
@@ -30,43 +34,22 @@ export default async function Dashboard({
   } else {
     redirect("/employers-login");
   }
+  const result = await fetchJobsData({pagename:"Dashboard"});
 
-  const { data, error } = await supabase
-    .from("jobs")
-    .select("*")
-    .eq("employer_id", userdata?.data?.user?.id) // Match employer_id
-    //.eq("id", "4b60e2db-637b-4580-a14f-1f984a097a83") // Match id
-    //  2e13eb5c-f88a-42ab-9262-5538d11ca315
-    .neq("is_draft", true); // Exclude rows where isDraft is true
+  // const { data, error } = await supabase
+  //   .from("jobs")
+  //   .select("*")
+  //   .eq("employer_id", userdata?.data?.user?.id) // Match employer_id
+  //   //.eq("id", "4b60e2db-637b-4580-a14f-1f984a097a83") // Match id
+  //   //  2e13eb5c-f88a-42ab-9262-5538d11ca315
+  //   .neq("is_draft", true); // Exclude rows where isDraft is true
 
-  if (error) {
-    console.error("Error fetching data:", error);
-  } else {
-    console.log("Fetched data:", data);
-  }
-  const signUp = async (formData: any) => {
-    "use server";
-    console.log("formData", formData);
-    let formattedDate = null;
-    if (formData?.deadline) {
-      const date = new Date(formData?.deadline);
-      formattedDate = date.toISOString().split("T")[0];
-    }
-    const supabase = createClient();
-    const { data, error } = await supabase
-      .from("jobs")
-      .select("*")
-      // .eq("employer_id", data1?.data?.user?.id) // Match employer_id
-      .eq("id", "4b60e2db-637b-4580-a14f-1f984a097a83") // Match id
-      //  2e13eb5c-f88a-42ab-9262-5538d11ca315
-      .neq("is_draft", true); // Exclude rows where isDraft is true
-
-    if (error) {
-      console.error("Error fetching data:", error);
-    } else {
-      console.log("Fetched data:", data);
-    }
-  };
+  // if (error) {
+  //   console.error("Error fetching data:", error);
+  // } else {
+  //   console.log("Fetched data:", data);
+  // }
+  
   return (
     <div>
       <div
@@ -137,7 +120,7 @@ export default async function Dashboard({
               <div
                 style={{ fontSize: "20px", fontWeight: 600, color: "#004A93" }}
               >
-                589
+                {result?.count}
               </div>
               <div
                 style={{
@@ -188,7 +171,7 @@ export default async function Dashboard({
               <div
                 style={{ fontSize: "20px", fontWeight: 600, color: "#004A93" }}
               >
-                2,517
+                0
               </div>
               <div
                 style={{
@@ -239,12 +222,10 @@ export default async function Dashboard({
         >
           Recently Posted Jobs
         </div>
-        <ViewAllButton />
+        <ViewAllButton redirectUrl={"/my-jobs"} />
       </Box>
       <MyJobs
-        searchParams={searchParams}
-        onSubmit={signUp}
-        data={data}
+        pagename={"overview"}
         showPagination={false}
       />
     </div>

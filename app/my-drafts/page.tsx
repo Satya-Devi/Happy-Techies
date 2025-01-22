@@ -1,5 +1,5 @@
 import { Hero } from "@/components/Hero/Hero";
-import MyJobs from "@/components/MyJobs/index";
+import DraftTable from "@/components/DraftSection/DraftTable";
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 
@@ -33,15 +33,14 @@ export default async function PostJob({
   return (
     <div>
       <Hero
-        title="My Posted Jobs"
+        title="My Drafts"
         subtitle=""
         align="center"
         role="Employer" 
-        page="my-jobs"
+        page="overview"
       />
 
-      <MyJobs 
-      // searchParams={searchParams}  
+      <DraftTable 
       showPagination={true} />
     </div>
   );

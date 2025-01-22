@@ -336,7 +336,33 @@ export async function Navbar({ role, page }: { role?: string; page?: string }) {
           </MenuDropdown>
         </Menu>
 
-        {user ? (
+       {(page=="employers-login" || page == "employer-signup") ? (emp_user ?
+       (
+        <form action={signOut}>
+          <Button
+            type="submit"
+            radius="md"
+            size="md"
+            variant="filled"
+            color="#004a93"
+          >
+            Logout
+          </Button>
+        </form>
+      ) : (
+        <Button
+          component="a"
+          href="/login"
+          radius="md"
+          size="md"
+          variant="filled"
+          color="#004a93"
+        >
+          Login
+        </Button>
+      )):
+    user ? 
+        (
           <form action={signOut}>
             <Button
               type="submit"
@@ -360,7 +386,8 @@ export async function Navbar({ role, page }: { role?: string; page?: string }) {
             Login
           </Button>
         )}
-        <Button
+       {page !=="employers-login" && page !== "employer-signup" &&
+       <Button
           component="a"
           href="/overview"
           radius="md"
@@ -369,7 +396,7 @@ export async function Navbar({ role, page }: { role?: string; page?: string }) {
           color="blue"
         >
           Employers
-        </Button>
+        </Button>}
       </Group>
     </>
   );

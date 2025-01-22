@@ -1,6 +1,8 @@
 "use client";
 import { useState, useEffect } from "react";
+import { fetchDraftsData , deleteDraft} from "@/app/my-drafts/action";
 import { SFProRounded } from "@/app/layout";
+import Loading from '@/app/loading'
 import {
   Button,
   TextInput,
@@ -77,37 +79,71 @@ const renderStatus = (
 };
 
 type Props = {
-  searchParams: {
-    message?: string;
-  };
-
-  onSubmit: (data: any) => {};
-  data: any;
+  pagename?: string;
   showPagination?: boolean;
 };
+interface JobRowData {
+  id?: string;
+  job_title?: string;
+  employment_type?: string;
+  job_location?: string;
+  created_at?: string;
+  title?: string;
+}
 
-const DraftTable = ({ searchParams, onSubmit, data, showPagination }: Props) => {
-  console.log(data);
+const DraftTable = ({   showPagination,pagename }: Props) => {
+
+  const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
-  const redirectToEditJob = (jobId?: string) => {
-    console.log("jobId", jobId);
-    redirect(`/edit-job?jobId=${jobId}`);
+  const [activePage, setActivePage] = useState(1);
+  const [data, setData] = useState<JobRowData[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedDraftId, setSelectedDraftId] = useState<string | null | undefined>(null);
+  // const [data, setData] = useState([]);
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    getDrafts(activePage);
+  },[activePage]);
+  const handleDiscardJob = async (draftId: string | undefined) => {
+    setSelectedDraftId(draftId);
+     setIsModalOpen(true);
+  }
+  const handleDiscardDraft = async () => {
+    try {
+      setIsModalOpen(false); // Close the modal after discarding the draft
+      setIsLoading(true);
+      await deleteDraft(selectedDraftId);
+      // Refresh the drafts list
+      await getDrafts(activePage); // Assuming you have a function to fetch drafts
+    } catch (error) {
+      console.error('Error discarding draft:', error);
+    }
+    setIsLoading(false);
   };
-  const rows = data.map(
+
+    const getDrafts = async (page: any | undefined) => {
+      try {
+        setIsLoading(true);
+        const result = await fetchDraftsData({limit:20, step:page, pagename:pagename});
+        if(result && result.data)
+        setData(result.data);
+        setCount(result.count ?? 0);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+  const rows =data &&  data.map(
     (
-      job: {
-        job_title: string;
-        employment_type: string;
-        job_location: string;
-        created_at: string;
-        title: string;
-      },
-      index: number
-    ) => (
+      job: JobRowData,
+      index: number 
+    ) => 
+(
       <Table.Tr key={index}>
         <Table.Td
           style={{
-            textAlign: "center",
+            textAlign: "center", 
             color: "#718096",
             fontWeight: 500,
             fontSize: "16px",
@@ -127,14 +163,13 @@ const DraftTable = ({ searchParams, onSubmit, data, showPagination }: Props) => 
             <div
               style={{ fontWeight: "bold", fontSize: "16px", color: "#333" }}
             >
-              {job?.job_title?
+              {job.job_title &&
+              job.job_title
                 .split(" ")
                 .map((word) => {
-                 
                   if (word.startsWith("(") && word.endsWith(")")) {
                     return word.toUpperCase();
                   }
-                 
                   return (
                     word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
                   );
@@ -192,6 +227,7 @@ const DraftTable = ({ searchParams, onSubmit, data, showPagination }: Props) => 
           >
             <div>
               <Button
+               onClick={() => handleDiscardJob(job.id)}
                 size="xs"
                 style={{
                   backgroundColor: "#DDF0FD",
@@ -205,6 +241,7 @@ const DraftTable = ({ searchParams, onSubmit, data, showPagination }: Props) => 
             </div>
             <div>
               <Button
+              onClick={() => {router.push(`/post-job?id=${job.id}`);}}
                 size="xs"
                 style={{
                   backgroundColor: "#DDF0FD",
@@ -218,6 +255,7 @@ const DraftTable = ({ searchParams, onSubmit, data, showPagination }: Props) => 
             </div>
             <div>
               <Button
+              onClick={() => {router.push(`/post-job?id=${job.id}&action=payment`);}}
                 size="xs"
                 style={{
                   backgroundColor: "#DDF0FD",
@@ -232,20 +270,44 @@ const DraftTable = ({ searchParams, onSubmit, data, showPagination }: Props) => 
           </div>
         </Table.Td>
       </Table.Tr>
-    )
-  );
+    )  );
   return (
     <Box mx="auto" p="lg" style={{ maxWidth: "89%" }}>
+      
       <div
+      className='jobs-table'
         style={{
           overflowX: "auto",
           msOverflowStyle: "none" /* IE and Edge */,
           scrollbarWidth: "none" /* Firefox */,
-          "&::-webkit-scrollbar": {
-            /* Chrome, Safari and Opera */ display: "none",
-          },
+          
         }}
       >
+         {isLoading ? (
+           
+        <div style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: '50vh', // This ensures vertical centering
+          width: '100%'
+        }}>
+          <Loading />
+        </div>
+        // In the render section:
+        //  <Loading />  // rest of the code
+        
+            ) : data.length === 0 ? (
+              <div style={{
+                textAlign: 'center',
+                padding: '40px',
+                color: '#718096',
+                fontSize: '16px'
+              }}>
+                No jobs found. Start by posting your first job.
+              </div>
+            ) : 
+           (
         <Table verticalSpacing="sm">
           <Table.Thead
             style={{
@@ -271,20 +333,83 @@ const DraftTable = ({ searchParams, onSubmit, data, showPagination }: Props) => 
           </Table.Thead>
           <Table.Tbody>{rows}</Table.Tbody>
         </Table>
+        )}
       </div>
-      {showPagination !== false && (
+      {showPagination && count &&(
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginTop: "30px",
+        }}
+      >
+       
         <div
           style={{
-            display: "flex",
-            justifyContent: "center",
-            marginTop: "30px",
+            fontSize: "18px",
+            fontWeight: 500,
+            color: "#000",
           }}
         >
-          <Pagination total={5} boundaries={1} defaultValue={1} />
+          Total {count || 0} Jobs
         </div>
-      )}
+        
+        <div style={{
+          display: "flex",
+          justifyContent: "center",
+          marginTop: "30px",
+        }}>
+          <Pagination
+            total={Math.ceil((count || 0) / 20)}
+            value={activePage}
+            onChange={(page) => {
+              setActivePage(page);
+              // router.push(`/post-job?page=${page}`);
+            }}
+            boundaries={1}
+          />
+        </div>
+        {/* <Pagination total={1} boundaries={1} defaultValue={1} /> */}
+      </div>)}
+      <Modal
+              opened={isModalOpen}
+              onClose={() => setIsModalOpen(false)}
+              centered
+              size="lg"
+            >
+              <Box ml={40} mr={40} mb={40}>
+                <Text className={SFProRounded.className} c="dark" size="md">
+                  {/* {searchParams?.message && searchParams.message == "Fail"?"Somthing went wrong Please try again!": ModalText?.length?ModalText:"The form has been submitted successfully!"} */}
+                  This action will permanently delete your draft. Are you sure you want to continue?
+                </Text>
+                <Button
+                  style={buttonStyle}
+                  onClick={() => {
+                    handleDiscardDraft();
+                  }}
+                  mt="md"
+                >
+                  Yes
+                </Button>
+              </Box>
+            </Modal>
     </Box>
+    
   );
 };
 
 export default DraftTable;
+const buttonStyle = {
+  backgroundColor: "#004a93",
+  color: "white",
+  // padding: "10px",
+  borderRadius: "20px",
+  height: "40px",
+  fontSize: "16px",
+  fontWeight: 500,
+  border: "none",
+  cursor: "pointer",
+  transition: "background-color 0.3s",
+};

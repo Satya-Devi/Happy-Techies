@@ -1,6 +1,6 @@
 .wrapper {
   position: relative;
-  padding-top: rem(20px);
+  padding-top: rem(30px);
   padding-bottom: rem(30px);
   /* margin-bottom: rem(20px); */
   background-blend-mode: linear-dodge, normal;

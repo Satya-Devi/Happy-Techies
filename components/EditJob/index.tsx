@@ -188,13 +188,14 @@ const validationSchema = Yup.object().shape({
 type Props = {
   searchParams: {
     message?: string;
+    
   };
-
+action?: string |undefined;
   onSubmit: (data: any) => {};
   data: any;
 };
 
-const EditJobForm = ({ searchParams, onSubmit, data }: Props) => {
+const EditJobForm = ({ searchParams, action, onSubmit, data }: Props) => {
   let formValue = null;
   if (data?.[0]?.application_deadline)
     formValue = new Date(data[0].application_deadline);
@@ -361,10 +362,10 @@ const EditJobForm = ({ searchParams, onSubmit, data }: Props) => {
         <div className={classes.header}>
           <div style={{ display: "flex", gap: "20px", alignItems: "center" }}>
             <div>
-              {formattedCreatedAt && (
+              {formattedCreatedAt &&  (
                 <>
                   <div style={{ fontSize: "10px", color: "blue" }}>
-                    Posting Date
+                    Posting Date {}
                   </div>
                   <div
                     style={{
@@ -390,7 +391,7 @@ const EditJobForm = ({ searchParams, onSubmit, data }: Props) => {
               {formattedDeadline && (
                 <>
                   <div style={{ fontSize: "10px", color: "red" }}>
-                    Expiray Date
+                    Expiray Date 
                   </div>
                   <div
                     style={{
@@ -460,6 +461,7 @@ const EditJobForm = ({ searchParams, onSubmit, data }: Props) => {
                   required
                   label="Employer Name"
                   placeholder="Name"
+                  readOnly={action == "view"}
                   value={formData.employerName}
                   onChange={(e) =>
                     handleInputChange("employerName", e.target.value)
@@ -484,6 +486,7 @@ const EditJobForm = ({ searchParams, onSubmit, data }: Props) => {
                   required
                   label="Employer Website"
                   placeholder="Website Link"
+                  readOnly={action == "view"}
                   // withAsterisk
                   value={formData.employerWebsite}
                   onChange={(e) =>
@@ -509,6 +512,7 @@ const EditJobForm = ({ searchParams, onSubmit, data }: Props) => {
                   required
                   label="Job Title"
                   placeholder="Title"
+                  readOnly={action == "view"}
                   // withAsterisk
                   value={formData.jobTitle}
                   onChange={(e) =>
@@ -537,6 +541,7 @@ const EditJobForm = ({ searchParams, onSubmit, data }: Props) => {
                   data={["Full Time", "Part Time", "Internship", "Freelance"]}
                   // data={["FULLTIME", "CONTRACTOR", "TEMPORARY"]}
                   // withAsterisk
+                  readOnly={action == "view"}
                   value={formData.jobType}
                   onChange={(value) => handleInputChange("jobType", value)}
                   styles={{
@@ -560,6 +565,7 @@ const EditJobForm = ({ searchParams, onSubmit, data }: Props) => {
                   required
                   label="Solution Area"
                   placeholder="Technology"
+                  readOnly={action == "view"}
                   data={[
                     "All",
                     "Business Application",
@@ -593,6 +599,7 @@ const EditJobForm = ({ searchParams, onSubmit, data }: Props) => {
                   required
                   label="Job Location"
                   placeholder="Location"
+                  readOnly={action == "view"}
                   // withAsterisk
 
                   value={formData.jobLocation}
@@ -621,6 +628,7 @@ const EditJobForm = ({ searchParams, onSubmit, data }: Props) => {
                   label="Workplace Type"
                   placeholder="On Site"
                   data={["On-Site", "Remote"]}
+                  readOnly={action == "view"}
                   // withAsterisk
                   // required
                   value={formData.workplaceType}
@@ -692,6 +700,7 @@ const EditJobForm = ({ searchParams, onSubmit, data }: Props) => {
                       required
                       type="number"
                       placeholder="Min"
+                      readOnly={action == "view"}
                       value={formData.salaryMin}
                       onChange={(e) =>
                         handleInputChange("salaryMin", e.target.value)
@@ -752,6 +761,7 @@ const EditJobForm = ({ searchParams, onSubmit, data }: Props) => {
                       type="number"
                       placeholder="Max"
                       value={formData.salaryMax}
+                      readOnly={action == "view"}
                       // rightSection={
                       //   <Select
                       //     data={["$", "₹"]}
@@ -835,6 +845,7 @@ const EditJobForm = ({ searchParams, onSubmit, data }: Props) => {
                   size="md"
                   label="Preferred Years Of Experience"
                   placeholder="Experience"
+                  readOnly={action == "view"}
                   // withAsterisk
                   required
                   min={0}
@@ -859,6 +870,7 @@ const EditJobForm = ({ searchParams, onSubmit, data }: Props) => {
                   size="md"
                   required
                   label="Select Application Deadline"
+                  readOnly={action == "view"}
                   value={formData.deadline}
                   placeholder="Job Application Deadline"
                   className="custom-input"
@@ -903,6 +915,7 @@ const EditJobForm = ({ searchParams, onSubmit, data }: Props) => {
                   label="Skills Required"
                   placeholder="Press Enter to submit a skill"
                   required
+                  readOnly={action == "view"}
                   value={formData.skills}
                   onChange={(skills) => handleInputChange("skills", skills)}
                   onRemove={(removedSkill) =>
@@ -934,6 +947,7 @@ const EditJobForm = ({ searchParams, onSubmit, data }: Props) => {
                   required
                   placeholder="Enter Job Description"
                   minRows={4}
+                  readOnly={action == "view"}
                   // withAsterisk
 
                   value={formData.jobDescription}
@@ -955,7 +969,8 @@ const EditJobForm = ({ searchParams, onSubmit, data }: Props) => {
           </Grid>
         </form>
       </Box>
-      <Group
+     {!action && 
+     <Group
         mt="lg"
         style={{
           display: "flex",
@@ -1009,7 +1024,7 @@ const EditJobForm = ({ searchParams, onSubmit, data }: Props) => {
             </Button>
           </Box>
         </Modal>
-      </Group>
+      </Group>}
     </div>
   );
 };

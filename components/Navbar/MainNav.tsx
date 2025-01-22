@@ -30,9 +30,11 @@ import {
 export default async function MainNav({
   children,
   role,
+  page,
 }: {
   children: ReactNode;
   role?: string;
+  page?: string;
 }) {
   const [drawerOpened, { toggle: toggleDrawer, close: closeDrawer }] =
     useDisclosure(false);

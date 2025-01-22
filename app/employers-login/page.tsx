@@ -65,7 +65,8 @@ export default function EmpLogin({
 
   return (
     <>
-      <ContainedNav role="Employer" />
+      {/* <ContainedNav role="Employer" /> */}
+      <ContainedNav page="employers-login" />
       <Container size="xl">
         <SimpleGrid cols={{ base: 1, md: 2 }}>
           <Paper

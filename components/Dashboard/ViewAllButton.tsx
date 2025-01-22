@@ -2,10 +2,12 @@
 
 import { Text } from "@mantine/core";
 import { useRouter } from "next/navigation";
-
-export const ViewAllButton = () => {
+type Props = {
+  redirectUrl?: string | undefined;
+};
+export const ViewAllButton = ( {redirectUrl}: Props) => {
   const router = useRouter();
-  
+  console.log("redirectionURLLLL",redirectUrl);
   return (
     <div
       style={{
@@ -16,7 +18,7 @@ export const ViewAllButton = () => {
         gap: "10px",
         cursor: "pointer",
       }}
-      onClick={() => router.push('/my-jobs')}
+      onClick={() => router.push(`${redirectUrl}`)}
     >
       <Text size="lg" fw={600} c="#00000099">
         View All

@@ -181,7 +181,8 @@ export default function EmpSignup({
 
   return (
     <>
-      <ContainedNav role="Employer" />
+      {/* <ContainedNav role="Employer" /> */}
+      <ContainedNav page="employers-signup" />
       <Container size="xl">
         <SimpleGrid cols={{ base: 1, md: 2 }}>
           <Paper
