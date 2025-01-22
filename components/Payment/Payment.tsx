@@ -15,9 +15,16 @@ import {
   Text,
   Title,
   TagsInput,
+  Card,
+  Badge,
+  List,
+  ThemeIcon,
+  Input,
+  ComboboxItem,
 } from "@mantine/core";
 import { DateInput } from "@mantine/dates";
-import { redirect ,useRouter} from "next/navigation";
+import { redirect, useRouter, useSearchParams } from "next/navigation";
+import { IconCheck, IconHelpCircle, IconEdit } from "@tabler/icons-react";
 
 import * as Yup from "yup";
 
@@ -41,14 +48,12 @@ const validationSchema = Yup.object().shape({
     .required("CVC is required"),
   country: Yup.string().required("Country is required"),
 });
-interface PaymentFormProps {
-  setShowPayment: (show: boolean) => void;
-  handleSubmit: (data: any) => void;
-}
-const PaymentForm = ({ setShowPayment ,handleSubmit}: PaymentFormProps) =>
 
+const PaymentForm = () =>
   // { onSubmit }: { onSubmit: (data: any) => void }
   {
+    const searchParams = useSearchParams();
+    const action = searchParams.get("action");
     const [formData, setFormData] = useState({
       employersName: "",
       companyName: "",
@@ -60,20 +65,16 @@ const PaymentForm = ({ setShowPayment ,handleSubmit}: PaymentFormProps) =>
       cvc: "",
       country: "",
     });
- 
-  const [warningModal, setWarningModal] = useState(false);
+
+    const [warningModal, setWarningModal] = useState(false);
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
     const [modalMessage, setModalMessage] = useState("");
-    const router=useRouter()
+    const router = useRouter();
     const handleInputChange = (key: string, value: any) => {
       console.log("handle", key, value, formData);
       setFormData((prev) => ({ ...prev, [key]: value }));
     };
-const handleContinue=()=>{
-  handleSubmit({});
-   setWarningModal(true);
-   
-}
+
     const validateForm = async (): Promise<boolean> => {
       try {
         // Filter out fields with no data before validation
@@ -102,8 +103,136 @@ const handleContinue=()=>{
       }
     };
 
+    const [promoteModalOpened, setPromoteModalOpened] = useState(false);
+
+    const handlePromoteJob = () => {
+      setPromoteModalOpened(false);
+    };
+
+    const [budgetType, setBudgetType] = useState("daily");
+    const [budget, setBudget] = useState("");
+    const handleBudgetTypeChange = (
+      value: string | null,
+      option: ComboboxItem
+    ) => {
+      if (value !== null) {
+        setBudgetType(value);
+      }
+    };
+
+    const [price, setPrice] = useState(115);
+    const [tax, setTax] = useState(10);
+    const [totalPrice, setTotalPrice] = useState(125);
+
     return (
       <>
+        <Modal
+          opened={promoteModalOpened}
+          onClose={() => setPromoteModalOpened(false)}
+          centered
+          size="lg"
+        >
+          <Box ml={40} mr={40} mb={40}>
+            <Title
+              ta="left"
+              order={1}
+              className={SFProRounded.className}
+              c="blue"
+              mb={10}
+            >
+              Promote Job
+            </Title>
+            <Text className={SFProRounded.className} c="dark" size="md" mb={20}>
+              Customize your job promotion to boost visibility and reach more
+              candidates. Choose a budget type and set your desired amount to
+              see estimated results.
+            </Text>
+
+            {/* Budget Selection Section */}
+            <Group align="flex-start" mb={20}>
+              <div>
+                <Text fw={500} mb={5}>
+                  Select Budget Type
+                </Text>
+                <Select
+                  checkIconPosition="right"
+                  value={budgetType}
+                  onChange={(value) => value !== null && setBudgetType(value)}
+                  data={[
+                    { value: "daily", label: "Daily" },
+                    { value: "weekly", label: "Weekly" },
+                    { value: "monthly", label: "Monthly" },
+                    { value: "total", label: "Total" },
+                  ]}
+                  placeholder="Select budget type"
+                />
+              </div>
+            </Group>
+
+            {/* Features List */}
+            <Text fw={500} mb={10}>
+              Features of Promoted Job:
+            </Text>
+            <List spacing="xs" size="sm" mb={20}>
+              <List.Item
+                icon={
+                  <ThemeIcon color="#004A93" size={20} radius="xl">
+                    <IconCheck size={14} />
+                  </ThemeIcon>
+                }
+              >
+                Shown at the top of search results
+              </List.Item>
+              <List.Item
+                icon={
+                  <ThemeIcon color="#004A93" size={20} radius="xl">
+                    <IconCheck size={14} />
+                  </ThemeIcon>
+                }
+              >
+                Top placement in job recommendations
+              </List.Item>
+              <List.Item
+                icon={
+                  <ThemeIcon color="#004A93" size={20} radius="xl">
+                    <IconCheck size={14} />
+                  </ThemeIcon>
+                }
+              >
+                Instant mobile alerts to qualified candidates
+              </List.Item>
+            </List>
+
+            {/* Save and Update Button */}
+            <Button
+              fullWidth
+              style={buttonStyle}
+              onClick={() => {
+                if (budgetType === "daily") {
+                  setPrice(115);
+                  setTax(10);
+                  setTotalPrice(125);
+                } else if (budgetType === "weekly") {
+                  setPrice(575);
+                  setTax(10);
+                  setTotalPrice(585);
+                } else if (budgetType === "monthly") {
+                  setPrice(2250);
+                  setTax(10);
+                  setTotalPrice(2260);
+                } else if (budgetType === "total") {
+                  setPrice(10000);
+                  setTax(10);
+                  setTotalPrice(10010);
+                }
+                setPromoteModalOpened(false);
+              }}
+            >
+              Save and Update Price
+            </Button>
+          </Box>
+        </Modal>
+
         <div
           style={{
             display: "flex",
@@ -115,6 +244,7 @@ const handleContinue=()=>{
           }}
         >
           {/* Summary Section */}
+
           <div
             style={{
               width: "20%",
@@ -122,46 +252,116 @@ const handleContinue=()=>{
               padding: "1.5rem",
             }}
           >
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                marginBottom: "0.5rem",
-              }}
-            >
-              <Text size="lg">Job Posting</Text>
-              <Text size="lg">$100.00</Text>
-            </div>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                marginBottom: "0.5rem",
-              }}
-            >
-              <Text size="lg">Sales Tax</Text>
-              <Text size="lg">$15.00</Text>
-            </div>
-            <hr
-              style={{
-                margin: "1rem 0",
-                border: "none",
-                borderTop: "1px solid #e9ecef",
-              }}
-            />
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-              }}
-            >
-              <Text size="xl" fw={500}>
-                Total
-              </Text>
-              <Text size="xl" fw={600}>
-                $115.00
-              </Text>
-            </div>
+            {action === "payment" ? (
+              <>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    marginBottom: "0.5rem",
+                  }}
+                >
+                  <Text size="lg">Job Posting</Text>
+                  <Text size="lg">{price}$</Text>
+                </div>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    marginBottom: "0.5rem",
+                  }}
+                >
+                  <Text size="lg">Sales Tax</Text>
+                  <Text size="lg">{tax}$</Text>
+                </div>
+                <hr
+                  style={{
+                    margin: "1rem 0",
+                    border: "none",
+                    borderTop: "1px solid #e9ecef",
+                  }}
+                />
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <Text size="xl" fw={500}>
+                    Total
+                  </Text>
+                  <Text size="xl" fw={600}>
+                    {totalPrice}$
+                  </Text>
+                </div>
+              </>
+            ) : (
+              <>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    marginBottom: "0.5rem",
+                  }}
+                >
+                  <Text
+                    size="lg"
+                    c="#004a93"
+                    fw={700}
+                    style={{
+                      cursor: "pointer",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      gap: 3,
+                    }}
+                    onClick={() => setPromoteModalOpened(true)}
+                  >
+                    Promote Job <IconEdit stroke={2} />
+                  </Text>
+                </div>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    marginBottom: "0.5rem",
+                  }}
+                >
+                  <Text size="lg">Job Posting</Text>
+                  <Text size="lg">{price}$</Text>
+                </div>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    marginBottom: "0.5rem",
+                  }}
+                >
+                  <Text size="lg">Sales Tax</Text>
+                  <Text size="lg">{tax}$</Text>
+                </div>
+                <hr
+                  style={{
+                    margin: "1rem 0",
+                    border: "none",
+                    borderTop: "1px solid #e9ecef",
+                  }}
+                />
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <Text size="xl" fw={500}>
+                    Total
+                  </Text>
+                  <Text size="xl" fw={600}>
+                    {totalPrice}$
+                  </Text>
+                </div>
+              </>
+            )}
           </div>
 
           {/* Payment Form */}
@@ -320,7 +520,9 @@ const handleContinue=()=>{
                         label="CVC"
                         placeholder="Enter CVC"
                         value={formData.cvc}
-                        onChange={(value) => handleInputChange("cvc", value)}
+                        onChange={(e) =>
+                          handleInputChange("cvc", e.target.value)
+                        }
                         rightSection={
                           <div
                             style={{
@@ -379,7 +581,9 @@ const handleContinue=()=>{
                       "Australia",
                     ]}
                     value={formData.country}
-                    onChange={(value) => handleInputChange("country", value)}
+                    onChange={(value) =>
+                      handleInputChange("country", value || "")
+                    }
                   />
                   {errors.country && (
                     <Text color="red" size="sm">
@@ -397,10 +601,8 @@ const handleContinue=()=>{
                 gap: "16px", // Space between buttons
               }}
             >
-              
               <Button
-              // onClick={() => router.push("/post-job")}
-               onClick={() => setShowPayment(false)}
+                onClick={() => router.push("/post-job")}
                 type="submit"
                 size="md"
                 style={{
@@ -412,7 +614,7 @@ const handleContinue=()=>{
                 Cancel
               </Button>
               <Button
-              onClick={() => handleContinue()}
+                onClick={() => setWarningModal(true)}
                 type="submit"
                 size="md"
                 style={{
@@ -428,9 +630,9 @@ const handleContinue=()=>{
                   height="16"
                   fill="none"
                   stroke="#ffffff"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                   style={{
                     marginLeft: "6px",
                   }}
@@ -441,38 +643,40 @@ const handleContinue=()=>{
                 </svg>
               </Button>
               <Modal
-                        opened={warningModal}
-                        onClose={() => setWarningModal(false)}
-                        centered
-                        size="lg"
-                      >
-                        <Box ml={40} mr={40} mb={40}>
-                          <Title
-                            ta="left"
-                            order={1}
-                            className={SFProRounded.className}
-                            c="blue"
-                            mb={10}
-                          >
-                            Success
-                            {/* {searchParams?.message && searchParams.message == "Success" ? "Success!" : "Fail!"} */}
-                          </Title>
-                          <Text className={SFProRounded.className} c="dark" size="md">
-                            {/* {searchParams?.message && searchParams.message == "Fail"?"Somthing went wrong Please try again!": ModalText?.length?ModalText:"The form has been submitted successfully!"} */}
-                            Your job listing request has been submitted and is pending for approval. You will be notified via email when the job goes live.
-                          </Text>
-                          <Button
-                            style={buttonStyle}
-                            onClick={() => {
-                              setWarningModal(false);
-                              router.push("/my-jobs");
-                            }}
-                            mt="md"
-                          >
-                            OK
-                          </Button>
-                        </Box>
-                      </Modal>
+                opened={warningModal}
+                onClose={() => setWarningModal(false)}
+                centered
+                size="lg"
+              >
+                <Box ml={40} mr={40} mb={40}>
+                  <Title
+                    ta="left"
+                    order={1}
+                    className={SFProRounded.className}
+                    c="blue"
+                    mb={10}
+                  >
+                    Success
+                    {/* {searchParams?.message && searchParams.message == "Success" ? "Success!" : "Fail!"} */}
+                  </Title>
+                  <Text className={SFProRounded.className} c="dark" size="md">
+                    {/* {searchParams?.message && searchParams.message == "Fail"?"Somthing went wrong Please try again!": ModalText?.length?ModalText:"The form has been submitted successfully!"} */}
+                    Your job listing request has been submitted and is pending
+                    for approval. You will be notified via email when the job
+                    goes live.
+                  </Text>
+                  <Button
+                    style={buttonStyle}
+                    onClick={() => {
+                      setWarningModal(false);
+                      router.push("/my-jobs");
+                    }}
+                    mt="md"
+                  >
+                    OK
+                  </Button>
+                </Box>
+              </Modal>
             </Group>
           </div>
         </div>
