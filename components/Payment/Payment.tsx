@@ -48,8 +48,11 @@ const validationSchema = Yup.object().shape({
     .required("CVC is required"),
   country: Yup.string().required("Country is required"),
 });
-
-const PaymentForm = () =>
+interface PaymentFormProps {
+  setShowPayments: () => void;
+  handleSubmit: (data: any) => void;
+}
+const PaymentForm = ({ setShowPayments, handleSubmit }: PaymentFormProps) =>
   // { onSubmit }: { onSubmit: (data: any) => void }
   {
     const searchParams = useSearchParams();
@@ -74,7 +77,10 @@ const PaymentForm = () =>
       console.log("handle", key, value, formData);
       setFormData((prev) => ({ ...prev, [key]: value }));
     };
-
+    const handleContinue = () => {
+      handleSubmit({});
+      setWarningModal(true);
+    };
     const validateForm = async (): Promise<boolean> => {
       try {
         // Filter out fields with no data before validation
@@ -109,21 +115,28 @@ const PaymentForm = () =>
       setPromoteModalOpened(false);
     };
 
-    const [budgetType, setBudgetType] = useState("daily");
+    const [budgetType, setBudgetType] = useState(null as string | null);
     const [budget, setBudget] = useState("");
-    const handleBudgetTypeChange = (
-      value: string | null,
-      option: ComboboxItem
-    ) => {
-      if (value !== null) {
-        setBudgetType(value);
-      }
-    };
 
-    const [price, setPrice] = useState(115);
+    const [price, setPrice] = useState(0);
     const [tax, setTax] = useState(10);
-    const [totalPrice, setTotalPrice] = useState(125);
-
+    const [totalPrice, setTotalPrice] = useState(
+      action == "payment" ? 110 : 10
+    );
+    useEffect(() => {
+      if (action == "payment") {
+        setTotalPrice(100 + price + tax);
+      } else {
+        setTotalPrice(price + tax);
+      }
+    }, [tax, price]);
+    const handleCancel =  () => {
+     if(action == "payment") {
+      setShowPayments();
+    }
+    else{
+      router.push("/my-jobs");
+    }}
     return (
       <>
         <Modal
@@ -157,12 +170,13 @@ const PaymentForm = () =>
                 <Select
                   checkIconPosition="right"
                   value={budgetType}
-                  onChange={(value) => value !== null && setBudgetType(value)}
+                  clearable
+                  onChange={(value) => value !== null && value !== undefined && setBudgetType(value)}
                   data={[
                     { value: "daily", label: "Daily" },
                     { value: "weekly", label: "Weekly" },
                     { value: "monthly", label: "Monthly" },
-                    { value: "total", label: "Total" },
+                    // { value: "total", label: "Total" },
                   ]}
                   placeholder="Select budget type"
                 />
@@ -209,22 +223,23 @@ const PaymentForm = () =>
               style={buttonStyle}
               onClick={() => {
                 if (budgetType === "daily") {
-                  setPrice(115);
+                  // setTotalPrice(60+price);
+                  setPrice(50);
                   setTax(10);
-                  setTotalPrice(125);
                 } else if (budgetType === "weekly") {
-                  setPrice(575);
+                  // setTotalPrice(30+price);
+                  setPrice(20);
                   setTax(10);
-                  setTotalPrice(585);
                 } else if (budgetType === "monthly") {
-                  setPrice(2250);
+                  // setTotalPrice(action=="payment"?110:10);
+                  setPrice(10);
                   setTax(10);
-                  setTotalPrice(2260);
-                } else if (budgetType === "total") {
-                  setPrice(10000);
-                  setTax(10);
-                  setTotalPrice(10010);
                 }
+                // else if (budgetType === "total") {
+                //   setPrice(10000);
+                //   setTax(10);
+                //   setTotalPrice(10010);
+                // }
                 setPromoteModalOpened(false);
               }}
             >
@@ -244,7 +259,6 @@ const PaymentForm = () =>
           }}
         >
           {/* Summary Section */}
-
           <div
             style={{
               width: "20%",
@@ -261,7 +275,40 @@ const PaymentForm = () =>
                     marginBottom: "0.5rem",
                   }}
                 >
+                  <Text
+                    size="lg"
+                    c="#004a93"
+                    fw={700}
+                    style={{
+                      cursor: "pointer",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      gap: 3,
+                    }}
+                    onClick={() => setPromoteModalOpened(true)}
+                  >
+                    Promote Job <IconEdit stroke={2} />
+                  </Text>
+                </div>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    marginBottom: "0.5rem",
+                  }}
+                >
                   <Text size="lg">Job Posting</Text>
+                  <Text size="lg">100$</Text>
+                </div>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    marginBottom: "0.5rem",
+                  }}
+                >
+                  <Text size="lg">Promoting Cost</Text>
                   <Text size="lg">{price}$</Text>
                 </div>
                 <div
@@ -291,6 +338,7 @@ const PaymentForm = () =>
                     Total
                   </Text>
                   <Text size="xl" fw={600}>
+                    {/* {action=="payment"?(price+tax+100):(price+tax)} */}
                     {totalPrice}$
                   </Text>
                 </div>
@@ -327,7 +375,7 @@ const PaymentForm = () =>
                     marginBottom: "0.5rem",
                   }}
                 >
-                  <Text size="lg">Job Posting</Text>
+                  <Text size="lg">Promoting cost</Text>
                   <Text size="lg">{price}$</Text>
                 </div>
                 <div
@@ -520,9 +568,7 @@ const PaymentForm = () =>
                         label="CVC"
                         placeholder="Enter CVC"
                         value={formData.cvc}
-                        onChange={(e) =>
-                          handleInputChange("cvc", e.target.value)
-                        }
+                        onChange={(value) => handleInputChange("cvc", value)}
                         rightSection={
                           <div
                             style={{
@@ -581,9 +627,7 @@ const PaymentForm = () =>
                       "Australia",
                     ]}
                     value={formData.country}
-                    onChange={(value) =>
-                      handleInputChange("country", value || "")
-                    }
+                    onChange={(value) => handleInputChange("country", value)}
                   />
                   {errors.country && (
                     <Text color="red" size="sm">
@@ -602,7 +646,9 @@ const PaymentForm = () =>
               }}
             >
               <Button
-                onClick={() => router.push("/post-job")}
+                // onClick={() => router.push("/post-job")}
+               // onClick={() => setShowPayment(false)}
+               onClick={handleCancel}
                 type="submit"
                 size="md"
                 style={{
@@ -614,7 +660,7 @@ const PaymentForm = () =>
                 Cancel
               </Button>
               <Button
-                onClick={() => setWarningModal(true)}
+                onClick={() => handleContinue()}
                 type="submit"
                 size="md"
                 style={{
@@ -630,9 +676,9 @@ const PaymentForm = () =>
                   height="16"
                   fill="none"
                   stroke="#ffffff"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
                   style={{
                     marginLeft: "6px",
                   }}

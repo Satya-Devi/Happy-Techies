@@ -169,8 +169,8 @@ const validationSchema = Yup.object().shape({
     .required("Deadline is required"),
   skills: Yup.array()
     .of(Yup.string().required("Each skill is required"))
-    .min(1, "At least one skill is required 123")
-    .required("Skills are required 123"),
+    .min(1, "At least one skill is required")
+    .required("Skills are required"),
   jobDescription: Yup.string()
     .required("Job Description is required")
     .transform((value) => (value === "" ? null : value))

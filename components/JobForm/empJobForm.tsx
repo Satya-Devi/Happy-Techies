@@ -90,6 +90,7 @@ const validationSchema = Yup.object().shape({
       /^[a-zA-Z0-9]+(?:[-'\s][a-zA-Z0-9]+)*$/,
       "Employer Name can only include letters, numbers, spaces, hyphens, and apostrophes"
     ),
+
   employerWebsite: Yup.string()
     .required("Employer website is required")
     .test("url", "Invalid website URL", (value) => {
@@ -134,14 +135,14 @@ const validationSchema = Yup.object().shape({
   salaryMin: Yup.number()
     .nullable()
     .transform((value, originalValue) =>
-      originalValue.trim() === "" ? undefined : Number(originalValue)
+      originalValue === "" ? undefined : Number(originalValue)
     )
 
     .min(1, "Minimum salary must be greater than 0"),
   salaryMax: Yup.number()
     .nullable()
     .transform((value, originalValue) =>
-      originalValue.trim() === "" ? undefined : Number(originalValue)
+      originalValue === "" ? undefined : Number(originalValue)
     )
     .test(
       "max-salary-test",
@@ -190,13 +191,26 @@ const validationSchema = Yup.object().shape({
     .typeError("Years of experience is required")
     .min(0, "Experience must be at least 0 years"),
 
-  deadline: Yup.date()
-    .min(new Date(), "Deadline must not be less than today")
-    .required("Deadline is required"),
+  // deadline: Yup.date()
+  //   .min(new Date(), "Deadline must not be less than today")
+  //   .required("Deadline is required"),
+    deadline: Yup.date()
+  .nullable()
+  .required("Deadline is required")
+  .test(
+    "is-future-date",
+    "Deadline must not be less than today",
+    (value) => {
+      if (!value) return true; // Skip validation if no date is selected (handled by .required())
+      const today = new Date();
+      today.setHours(0, 0, 0, 0); // Reset time to compare only dates
+      return value >= today;
+    }
+  ),
   skills: Yup.array()
     .of(Yup.string().required("Each skill is required"))
-    .min(1, "At least one skill is required 123")
-    .required("Skills are required 123"),
+    .min(1, "At least one skill is required")
+    .required("Skills are required"),
   jobDescription: Yup.string()
     .required("Job Description is required")
     .transform((value) => (value === "" ? null : value))
@@ -245,6 +259,10 @@ const draftValidationSchema = Yup.object().shape({
       /^[a-zA-Z0-9]+(?:[-'\s][a-zA-Z0-9]+)*$/,
       "Employer Name can only include letters, numbers, spaces, hyphens, and apostrophes"
     ),
+
+
+
+
   employerWebsite: Yup.string()
     .nullable()
     .test("url", "Invalid website URL", (value) => {
@@ -290,7 +308,7 @@ const draftValidationSchema = Yup.object().shape({
   salaryMin: Yup.number()
     .nullable()
     .transform((value, originalValue) =>
-      originalValue?.trim() === "" ? null : Number(originalValue)
+      originalValue === "" ? null : Number(originalValue)
     )
     .test("optional-min-salary", "Invalid minimum salary", function (value) {
       return !value || value > 1;
@@ -299,7 +317,7 @@ const draftValidationSchema = Yup.object().shape({
   salaryMax: Yup.number()
     .nullable()
     .transform((value, originalValue) =>
-      originalValue?.trim() === "" ? null : Number(originalValue)
+      originalValue === "" ? null : Number(originalValue)
     )
     .test(
       "optional-max-salary",
@@ -316,9 +334,22 @@ const draftValidationSchema = Yup.object().shape({
     .test("optional-validation", "Invalid experience value", function (value) {
       return !value || (value >= 0 && Number.isInteger(value));
     }),
-  deadline: Yup.date()
-    .min(new Date(), "Deadline must not be less than today")
-    .nullable(),
+  // deadline: Yup.date()
+  //   .min(new Date(), "Deadline must not be less than today")
+  //   .nullable(),
+    deadline: Yup.date()
+  .nullable()
+  .required("Deadline is required")
+  .test(
+    "is-future-date",
+    "Deadline must not be less than today",
+    (value) => {
+      if (!value) return true; // Skip validation if no date is selected (handled by .required())
+      const today = new Date();
+      today.setHours(0, 0, 0, 0); // Reset time to compare only dates
+      return value >= today;
+    }
+  ),
   skills: Yup.array()
     .nullable()
     .transform((value) => (!value ? [] : value))
@@ -515,15 +546,17 @@ const EmpJobForm = ({ searchParams, onSubmit, data }: Props) => {
   const validateForm = async (): Promise<boolean> => {
     try {
       await validationSchema.validate(formData, { abortEarly: false });
+      console.log("NOOOOOO ERRRRRORRRRS")
       setErrors({});
       return true;
     } catch (validationErrors) {
+      console.log("ERROR: " + validationErrors)
       if (validationErrors instanceof Yup.ValidationError) {
         const formErrors: { [key: string]: string } = {};
         validationErrors.inner.forEach((error) => {
           formErrors[error.path || ""] = error.message;
         });
-        console.log("formErrors", formErrors);
+        console.log("formErrorssss", formErrors);
         setErrors(formErrors);
       }
       return false;
@@ -555,6 +588,7 @@ const EmpJobForm = ({ searchParams, onSubmit, data }: Props) => {
     if (is_draft) {
       isValid = Object.keys(errors).length === 0;
     } else {
+      console.log("VALIDATION",Object.keys(errors).length,errors);
       isValid = await validateForm();
     }
     console.log("isValid&&&&&&&&&&&", isValid, errors);
@@ -654,7 +688,10 @@ const EmpJobForm = ({ searchParams, onSubmit, data }: Props) => {
   interface ImagePreviewWrapperProps {
     file: File | string | null;
   }
+const showPaymentpage=()=>{
+  setShowPayment(false);
 
+}
   const ImagePreviewWrapper = ({ file }: ImagePreviewWrapperProps) => {
     const [preview, setPreview] = useState<string | null>(null);
 
@@ -704,7 +741,9 @@ const EmpJobForm = ({ searchParams, onSubmit, data }: Props) => {
 
   return showPayment ? (
     <div>
-      <PaymentForm setShowPayment={setShowPayment} handleSubmit={handleSubmit} />
+      {/* <PaymentForm setShowPayment={setShowPayment} handleSubmit={handleSubmit} /> */}
+      <PaymentForm setShowPayments={showPaymentpage} handleSubmit={handleSubmit} />
+
     </div>
   ) : (
     <div>

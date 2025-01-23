@@ -11,6 +11,7 @@ type HeroProps = {
   subtitle: string;
   role?: string;
   page?: string;
+  subpage?: string;
   align: "left" | "center" | "right";
   isHome?: boolean;
   isPartner?: boolean;
@@ -33,7 +34,7 @@ export function Hero({
   titleStyles = {},
   subtitleStyles = {},
   titleClass,
-  backButtonStyles = {},
+  backButtonStyles = {cursor: "pointer"},
 }: HeroProps) {
   const containerClass = isHome ? classes.heroWrapper : classes.wrapper;
 
@@ -59,12 +60,12 @@ export function Hero({
         (role === "Employer" ? (
           <div className={classes.header}>
             <div className={classes.backButtonContainer}>
-              {page && (page == "my-jobs") ? (
+              {page && (page == "my-jobs" ) ? (
                 <div
                   style={{
                     fill: "#004A93",
                     color: "transparent",
-                    cursor: "pointer",
+                    // cursor: "pointer",
                     width: "48px",
                     height: "48px",
                     marginLeft: "20px",

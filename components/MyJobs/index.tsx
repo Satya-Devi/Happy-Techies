@@ -1,10 +1,13 @@
 "use client";
-import { fetchJobsData , markJobInactive, deleteJob} from "@/app/my-jobs/action";
+import {
+  fetchJobsData,
+  markJobInactive,
+  deleteJob,
+} from "@/app/my-jobs/action";
 import { useState, useEffect } from "react";
 import { SFProRounded } from "@/app/layout";
-import { Loader } from '@mantine/core';
-import Loading from '@/app/loading'
-
+import { Loader } from "@mantine/core";
+import Loading from "@/app/loading";
 
 import {
   Button,
@@ -49,7 +52,7 @@ interface JobRowData {
 }
 const renderStatus = (
   deadline: string | undefined,
-  status: string | undefined,
+  status: string | undefined
 ): { text: string; color: string; icon: JSX.Element } => {
   const currentDate = new Date();
   const deadlineDate = new Date(deadline || "");
@@ -99,17 +102,16 @@ const renderStatus = (
       };
 };
 
-const  MyJobs = ({showPagination,pagename}: Props) => {
+const MyJobs = ({ showPagination, pagename }: Props) => {
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
   const [activePage, setActivePage] = useState(1);
   const [data, setData] = useState<JobRowData[]>([]);
   const [count, setCount] = useState(0);
 
-
   useEffect(() => {
     getData(activePage);
-  },[activePage]);
+  }, [activePage]);
 
   const handleMarkInactive = async (jobId: any) => {
     try {
@@ -117,7 +119,7 @@ const  MyJobs = ({showPagination,pagename}: Props) => {
       // Refresh the jobs data
       getData(activePage);
     } catch (error) {
-      console.error('Error marking job as inactive:', error);
+      console.error("Error marking job as inactive:", error);
     }
   };
   const deleteInactiveJob = async (jobId: any) => {
@@ -126,27 +128,27 @@ const  MyJobs = ({showPagination,pagename}: Props) => {
       // Refresh the jobs data
       getData(activePage);
     } catch (error) {
-      console.error('Error marking job as inactive:', error);
+      console.error("Error marking job as inactive:", error);
     }
   };
   const getData = async (page: any | undefined) => {
     try {
       setIsLoading(true);
-      const result = await fetchJobsData({limit:20, step:page, pagename:pagename});
-      if(result && result.data)
-      
-      setData(result.data);
+      const result = await fetchJobsData({
+        limit: 20,
+        step: page,
+        pagename: pagename,
+      });
+      if (result && result.data) setData(result.data);
       setCount(result.count ?? 0);
     } finally {
       setIsLoading(false);
     }
-  }
-  
-  const rows = data && data.map(
-    (
-      job: JobRowData,
-      index: number
-    ) => (
+  };
+
+  const rows =
+    data &&
+    data.map((job: JobRowData, index: number) => (
       <Table.Tr key={index}>
         <Table.Td
           style={{
@@ -218,7 +220,8 @@ const  MyJobs = ({showPagination,pagename}: Props) => {
               alignItems: "center",
               justifyContent: "center",
               gap: "3px",
-              color: renderStatus(job.application_deadline,job.job_status).color,
+              color: renderStatus(job.application_deadline, job.job_status)
+                .color,
             }}
           >
             {renderStatus(job.application_deadline, job.job_status).icon}
@@ -305,7 +308,9 @@ const  MyJobs = ({showPagination,pagename}: Props) => {
             <div
               style={{ fontWeight: 500, fontSize: "16px", cursor: "pointer" }}
               onClick={() => router.push(`/applicants-preview?id=${job.id}`)}
-            >              0 Applicants 
+            >
+              {" "}
+              0 Applicants
             </div>
             <div>
               <Button
@@ -376,61 +381,72 @@ const  MyJobs = ({showPagination,pagename}: Props) => {
                   color: "#004A93",
                   padding: "8px 16px",
                 }}
-                onClick={() => router.push(`/edit-job?id=${job.id}&action=view`)}
+                onClick={() =>
+                  router.push(`/edit-job?id=${job.id}&action=view`)
+                }
               >
                 View Details
               </Menu.Item>
-              <Menu.Item
-                style={{
-                  fontSize: "15px",
-                  fontWeight: 500,
-                  textAlign: "start",
-                  color: "#004A93",
-                  padding: "8px 16px",
-                }}
-                onClick={() => router.push(`/edit-job?id=${job.id}`)}
-              >
-                Edit Details
-              </Menu.Item>
-               {job?.job_status === "inactive" && 
-              <Menu.Item
-              onClick={() => deleteInactiveJob(job.id)}
-
-                style={{
-                  fontSize: "15px",
-                  fontWeight: 500,
-                  textAlign: "start",
-                  color: "#004A93",
-                  padding: "8px 16px",
-                }}
-              >
-                Delete Details
-              </Menu.Item>}
-              <Menu.Item
-              onClick={() => handleMarkInactive(job.id)}
-
-                style={{
-                  fontSize: "15px",
-                  fontWeight: 500,
-                  textAlign: "start",
-                  color: "#004A93",
-                  padding: "8px 16px",
-                }}
-              >
-                Mark as Inactive
-              </Menu.Item>
-              
-              <Menu.Item
-                style={{
-                  fontSize: "15px",
-                  fontWeight: 500,
-                  textAlign: "start",
-                  color: "#004A93",
-                  padding: "8px 16px",
-                }}
-              >
-                Promote Job
-              </Menu.Item>
+              {(job?.job_status === null || job?.job_status === undefined) && (
+                <Menu.Item
+                  style={{
+                    fontSize: "15px",
+                    fontWeight: 500,
+                    textAlign: "start",
+                    color: "#004A93",
+                    padding: "8px 16px",
+                  }}
+                  onClick={() => router.push(`/edit-job?id=${job.id}`)}
+                >
+                  Edit Details
+                </Menu.Item>
+              )}
+              {job?.job_status === "inactive" && (
+                <Menu.Item
+                  onClick={() => deleteInactiveJob(job.id)}
+                  style={{
+                    fontSize: "15px",
+                    fontWeight: 500,
+                    textAlign: "start",
+                    color: "#004A93",
+                    padding: "8px 16px",
+                  }}
+                >
+                  Delete Details
+                </Menu.Item>
+              )}
+              {(job?.job_status === null || job?.job_status === undefined) && (
+                <Menu.Item
+                  onClick={() => handleMarkInactive(job.id)}
+                  style={{
+                    fontSize: "15px",
+                    fontWeight: 500,
+                    textAlign: "start",
+                    color: "#004A93",
+                    padding: "8px 16px",
+                  }}
+                >
+                  Mark as Inactive{job?.job_status}
+                </Menu.Item>
+              )}
+              {(job?.job_status === null || job?.job_status === undefined) && (
+                <Menu.Item
+                  style={{
+                    fontSize: "15px",
+                    fontWeight: 500,
+                    textAlign: "start",
+                    color: "#004A93",
+                    padding: "8px 16px",
+                  }}
+                  onClick={() =>
+                    router.push(
+                      `/payment?jobId=${job.id}&jobTitle=${job.job_title}`
+                    )
+                  }
+                >
+                  Promote Job
+                </Menu.Item>
+              )}
               <Menu.Item
                 style={{
                   fontSize: "15px",
@@ -447,114 +463,116 @@ const  MyJobs = ({showPagination,pagename}: Props) => {
           </Menu>
         </Table.Td>
       </Table.Tr>
-    )
-  );
+    ));
   return (
     <Box mx="auto" p="lg" style={{ maxWidth: "89%" }}>
       <div className="scrollbar_hidden">
-    {isLoading ? (
-   
-<div style={{
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-  minHeight: '50vh', // This ensures vertical centering
-  width: '100%'
-}}>
-  <Loading />
-</div>
-// In the render section:
-//  <Loading />  // rest of the code
-
-    ) : data.length === 0 ? (
-      <div style={{
-        textAlign: 'center',
-        padding: '40px',
-        color: '#718096',
-        fontSize: '16px'
-      }}>
-        No jobs found. Start by posting your first job.
-      </div>
-    ) : 
-   (
-        <Table verticalSpacing="sm">
-          <Table.Thead
+        {isLoading ? (
+          <div
             style={{
-              backgroundColor: "#DDF0FD",
-              color: "#004A93",
-              height: "30px",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              minHeight: "50vh", // This ensures vertical centering
+              width: "100%",
             }}
           >
-            <Table.Tr>
-              <Table.Th style={{ textAlign: "center", whiteSpace: "nowrap" }}>
-                S.No
-              </Table.Th>
-              <Table.Th style={{ textAlign: "center", whiteSpace: "nowrap" }}>
-                JOBS
-              </Table.Th>
-              <Table.Th style={{ textAlign: "center", whiteSpace: "nowrap" }}>
-                STATUS
-              </Table.Th>
-              <Table.Th style={{ textAlign: "center", whiteSpace: "nowrap" }}>
-                SOLUTION AREA
-              </Table.Th>
-              <Table.Th style={{ textAlign: "center", whiteSpace: "nowrap" }}>
-                POSTING DATE
-              </Table.Th>
-              <Table.Th style={{ textAlign: "center", whiteSpace: "nowrap" }}>
-                EXPIRY DATE
-              </Table.Th>
-              <Table.Th style={{ textAlign: "center", whiteSpace: "nowrap" }}>
-                APPLICATIONS
-              </Table.Th>
-              <Table.Th style={{ textAlign: "center", whiteSpace: "nowrap" }}>
-                ACTIONS
-              </Table.Th>
-            </Table.Tr>
-          </Table.Thead>
-          <Table.Tbody>{rows}</Table.Tbody>
-        </Table>
-      
-    )}
+            <Loading />
+          </div>
+        ) : // In the render section:
+        //  <Loading />  // rest of the code
+
+        data.length === 0 ? (
+          <div
+            style={{
+              textAlign: "center",
+              padding: "40px",
+              color: "#718096",
+              fontSize: "16px",
+            }}
+          >
+            No jobs found. Start by posting your first job.
+          </div>
+        ) : (
+          <Table verticalSpacing="sm">
+            <Table.Thead
+              style={{
+                backgroundColor: "#DDF0FD",
+                color: "#004A93",
+                height: "30px",
+              }}
+            >
+              <Table.Tr>
+                <Table.Th style={{ textAlign: "center", whiteSpace: "nowrap" }}>
+                  S.No
+                </Table.Th>
+                <Table.Th style={{ textAlign: "center", whiteSpace: "nowrap" }}>
+                  JOBS
+                </Table.Th>
+                <Table.Th style={{ textAlign: "center", whiteSpace: "nowrap" }}>
+                  STATUS
+                </Table.Th>
+                <Table.Th style={{ textAlign: "center", whiteSpace: "nowrap" }}>
+                  SOLUTION AREA
+                </Table.Th>
+                <Table.Th style={{ textAlign: "center", whiteSpace: "nowrap" }}>
+                  POSTING DATE
+                </Table.Th>
+                <Table.Th style={{ textAlign: "center", whiteSpace: "nowrap" }}>
+                  EXPIRY DATE
+                </Table.Th>
+                <Table.Th style={{ textAlign: "center", whiteSpace: "nowrap" }}>
+                  APPLICATIONS
+                </Table.Th>
+                <Table.Th style={{ textAlign: "center", whiteSpace: "nowrap" }}>
+                  ACTIONS
+                </Table.Th>
+              </Table.Tr>
+            </Table.Thead>
+            <Table.Tbody>{rows}</Table.Tbody>
+          </Table>
+        )}
       </div>
-      {showPagination && count &&(
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginTop: "30px",
-        }}
-      >
-       
+      {showPagination && count && (
         <div
           style={{
-            fontSize: "18px",
-            fontWeight: 500,
-            color: "#000",
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginTop: "30px",
           }}
         >
-          Total {count || 0} Jobs
-        </div>
-        
-        <div style={{
-          display: "flex",
-          justifyContent: "center",
-          marginTop: "30px",
-        }}>
-          <Pagination
-            total={Math.ceil((count || 0) / 20)}
-            value={activePage}
-            onChange={(page) => {
-              setActivePage(page);
-              // router.push(`/post-job?page=${page}`);
+          <div
+            style={{
+              fontSize: "18px",
+              fontWeight: 500,
+              color: "#000",
             }}
-            boundaries={1}
-          />
+          >
+            Total {count || 0} Jobs
+          </div>
+
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              marginTop: "30px",
+            }}
+          >
+            <Pagination
+              total={Math.ceil((count || 0) / 20)}
+              value={activePage}
+              onChange={(page) => {
+                setActivePage(page);
+                // router.push(`/post-job?page=${page}`);
+              }}
+              boundaries={1}
+            />
+          </div>
+          {/* <Pagination total={1} boundaries={1} defaultValue={1} /> */}
         </div>
-        {/* <Pagination total={1} boundaries={1} defaultValue={1} /> */}
-      </div>)}
+      )}
     </Box>
   );
 };

@@ -29,6 +29,8 @@ interface JobData {
   id: string;
   job_title: string;
   company_name: string;
+  job_location: string;
+  employement_type: string;
   applicants?: Array<{
     id: string;
     name: string;
@@ -36,6 +38,7 @@ interface JobData {
     resume_url?: string;
     avatar_url?: string;
     application_date: string;
+    
     status: "pending" | "reviewed" | "rejected" | "accepted";
   }>;
   solution_area?: string; // Add this line
@@ -449,8 +452,8 @@ const Applicants = ({ data }: ApplicantsProps) => {
                       color: "#718096",
                     }}
                   >
-                    <div>{data.employment_type}</div>
-                    {data.job_location && data.employment_type && (
+                    <div>{data?.employement_type}</div>
+                    {data?.job_location && data?.employement_type && (
                       <div
                         style={{
                           width: "1.5px",
@@ -581,7 +584,7 @@ const Applicants = ({ data }: ApplicantsProps) => {
                         margin: "0 auto",
                         display: "block",
                       }}
-                      onClick={() => router.push(`/job-preview?id=${job.id}`)}
+                       onClick={() => router.push(`/job-preview?id=${data.id}`)}
                     >
                       View
                     </Button>
