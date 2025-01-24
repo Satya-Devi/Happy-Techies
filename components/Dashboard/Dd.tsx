@@ -1,86 +1,3 @@
-// 'use client';
-// import { useState, useEffect } from 'react';
-// import { ViewAllButton } from "./ViewAllButton";
-// import MyJobs from "../MyJobs";
-// import { Container, Text, Box } from "@mantine/core";
-// import { fetchJobsData} from "@/app/my-jobs/action";
-// import { useRouter } from "next/navigation";
-// import Loading from "@/app/loading";
-// import DashboardHeader from "@/components/DashboardHeader/DashboardHeader";
-// export default async function Dashboard(
-// //   {
-// //   searchParams,
-// // }: {
-// //   searchParams: { [key: string]: string };
-// // }
-// ) {
-
-//   // const [jobsCount, setJobsCount] = useState(0);
-//   // const [loading, setLoading] = useState(true);
-//   // const [error, setError] = useState(null);
-
-//   // function fetchJobs() {
-//   //   setLoading(true);
-  
-//   //   fetchJobsData({ action: 'Count' })
-//   //     .then((result) => {
-//   //       if (result.error) {
-//   //         throw new Error(result.error.message);
-//   //       }
-//   //       setJobsCount(result?.count || 0);
-//   //     })
-//   //     .catch((err) => {
-//   //       setError(err);
-//   //     })
-//   //     .finally(() => {
-//   //       setLoading(false);
-//   //     });
-//   // }
-  
-
-//   // useEffect(() => {
-//   //   fetchJobs();
-//   // }, []);
-// //const result = await fetchJobsData({pagename:"Dashboard"});
-// const router = useRouter();
- 
-  
-//   return (
-    
-//     <div> 
-       
-     
-//      <DashboardHeader/>
-//      <Box
-//         mx="auto"
-//         style={{
-//           maxWidth: "85%",
-//           display: "flex",
-//           flexDirection: "row",
-//           justifyContent: "space-between",
-//           alignItems: "center",
-//         }}
-//       >
-//         <div
-//           style={{
-//             fontSize: "23px",
-//             fontWeight: 600,
-//             color: "#000",
-//           }}
-//         >
-//           Recently Posted Jobs
-//         </div>
-//         <ViewAllButton redirectUrl={"/my-jobs?nav_from=Dashboard"} />
-//       </Box>
-//       <MyJobs
-//         pagename={"overview"}
-//         showPagination={false}
-//       />
-    
-//     </div>
-//     )
-  
-// }
 'use client';
 import { useState, useEffect } from 'react';
 import { ViewAllButton } from "./ViewAllButton";
@@ -89,12 +6,8 @@ import { Container, Text, Box } from "@mantine/core";
 import { fetchJobsData} from "@/app/my-jobs/action";
 import { useRouter } from "next/navigation";
 import Loading from "@/app/loading";
-type Props = {
 
-  count?: any;
-};
-export default  function Dashboard(
-  { count }: Props
+export default async function Dashboard(
 //   {
 //   searchParams,
 // }: {
@@ -102,34 +15,32 @@ export default  function Dashboard(
 // }
 ) {
 
-  // const [jobsCount, setJobsCount] = useState(0);
-  // const [loading, setLoading] = useState(false);
-  // const [error, setError] = useState(null);
+  const [jobsCount, setJobsCount] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
+  function fetchJobs() {
+    setLoading(true);
   
+    fetchJobsData({ action: 'Count' })
+      .then((result) => {
+        if (result.error) {
+          throw new Error(result.error.message);
+        }
+        setJobsCount(result?.count || 0);
+      })
+      .catch((err) => {
+        setError(err);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }
   
 
-  // useEffect(() => {
-  //   fetchJobs();
-  // }, []);
-
-  // function fetchJobs() {
-  //   //  setLoading(true);
-  
-  //   fetchJobsData({ action: 'Count' })
-  //     .then((result) => {
-  //       if (result.error) {
-  //         throw new Error(result.error.message);
-  //       }
-  //       //  setJobsCount(result?.count || 0);
-  //     })
-  //     .catch((err) => {
-  //       setError(err);
-  //     })
-  //     .finally(() => {
-  //       // setLoading(false);
-  //     });
-  // }
+  useEffect(() => {
+    fetchJobs();
+  }, []);
 //const result = await fetchJobsData({pagename:"Dashboard"});
 const router = useRouter();
  
@@ -137,7 +48,7 @@ const router = useRouter();
   return (
     
     <div> 
-       {/* {loading ? (
+       {loading ? (
               <div
                 style={{
                   display: "flex",
@@ -152,7 +63,7 @@ const router = useRouter();
               </div>
             ) :
     
-       (  */}
+      (
         <div>
       <div
         style={{
@@ -225,8 +136,7 @@ const router = useRouter();
               <div
                 style={{ fontSize: "20px", fontWeight: 600, color: "#004A93" }}
               >
-                {/* {jobsCount} */}
-                {count}
+                {jobsCount}
               </div>
               <div
              
@@ -335,10 +245,8 @@ const router = useRouter();
         pagename={"overview"}
         showPagination={false}
       />
-      </div>
-     {/* )}  */}
+      </div>)}
     </div>
     )
   
 }
-

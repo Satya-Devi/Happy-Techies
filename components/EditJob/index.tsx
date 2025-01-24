@@ -16,6 +16,7 @@ import {
   Badge,
   TagsInput,
 } from "@mantine/core";
+import { IconCheck, IconHelpCircle, IconEdit } from "@tabler/icons-react";
 
 import { DateInput } from "@mantine/dates";
 import { redirect } from "next/navigation";
@@ -106,14 +107,14 @@ const validationSchema = Yup.object().shape({
     ),
   workplaceType: Yup.string().required("Workplace type is required"),
   salaryMin: Yup.number()
-  .nullable()
+    .nullable()
     .transform((value, originalValue) =>
       originalValue.trim() === "" ? undefined : Number(originalValue)
     )
     // .required("Salary range is required")
     .min(1, "Minimum salary must be greater than 0"),
   salaryMax: Yup.number()
-  .nullable()
+    .nullable()
     .transform((value, originalValue) =>
       originalValue.trim() === "" ? undefined : Number(originalValue)
     )
@@ -140,12 +141,12 @@ const validationSchema = Yup.object().shape({
       "Maximum salary must be greater than minimum salary",
       function (value) {
         const { salaryMin } = this.parent;
-        
+
         // Only validate if salaryMin has a value
         if (!salaryMin) {
           return true;
         }
-    
+
         console.log("Current max value:", value);
         console.log("Current min value:", salaryMin);
         console.log(
@@ -155,11 +156,11 @@ const validationSchema = Yup.object().shape({
           Number(salaryMin),
           Number(value) >= Number(salaryMin)
         );
-    
+
         return Number(value) >= Number(salaryMin);
       }
     ),
-    experience: Yup.number()
+  experience: Yup.number()
     .required("Years of experience is required")
     .typeError("Years of experience is required")
     .min(0, "Experience must be at least 0 years"),
@@ -188,18 +189,17 @@ const validationSchema = Yup.object().shape({
 type Props = {
   searchParams: {
     message?: string;
-    
   };
-action?: string |undefined;
+  actions?: string | undefined;
   onSubmit: (data: any) => {};
   data: any;
 };
 
-const EditJobForm = ({ searchParams, action, onSubmit, data }: Props) => {
+const EditJobForm = ({ searchParams, actions, onSubmit, data }: Props) => {
   let formValue = null;
   if (data?.[0]?.application_deadline)
     formValue = new Date(data[0].application_deadline);
-
+  const [action, setAction] = useState(actions);
   const [formData, setFormData] = useState({
     employerName: data?.[0]?.company_name || "",
     employerWebsite: data?.[0]?.links[0] || "",
@@ -348,6 +348,7 @@ const EditJobForm = ({ searchParams, action, onSubmit, data }: Props) => {
   }
   return (
     <div>
+    
       <Box
         mx="auto"
         p="lg"
@@ -359,10 +360,22 @@ const EditJobForm = ({ searchParams, action, onSubmit, data }: Props) => {
           border: "0.9px solid #D6D6D6",
         }}
       >
+        <div
+        onClick={() => setAction("")}
+          style={{
+            color: "grey",
+             display: "flex",
+             padding: "10px",
+             width: "100%",
+            justifyContent: "right",
+          }}
+        >
+        <IconEdit stroke={2} /> Edit
+        </div>
         <div className={classes.header}>
           <div style={{ display: "flex", gap: "20px", alignItems: "center" }}>
             <div>
-              {formattedCreatedAt &&  (
+              {formattedCreatedAt && (
                 <>
                   <div style={{ fontSize: "10px", color: "blue" }}>
                     Posting Date {}
@@ -391,7 +404,7 @@ const EditJobForm = ({ searchParams, action, onSubmit, data }: Props) => {
               {formattedDeadline && (
                 <>
                   <div style={{ fontSize: "10px", color: "red" }}>
-                    Expiray Date 
+                    Expiray Date
                   </div>
                   <div
                     style={{
@@ -445,7 +458,7 @@ const EditJobForm = ({ searchParams, action, onSubmit, data }: Props) => {
             </Group>
           </div>
         </div>
-
+      
         <form>
           <Grid
             gutter={34}
@@ -969,62 +982,63 @@ const EditJobForm = ({ searchParams, action, onSubmit, data }: Props) => {
           </Grid>
         </form>
       </Box>
-     {!action && 
-     <Group
-        mt="lg"
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          gap: "16px",
-        }}
-      >
-        <Button
-          type="submit"
-          size="md"
+      {!action && (
+        <Group
+          mt="lg"
           style={{
-            backgroundColor: "#004A93",
-            color: "white",
+            display: "flex",
+            justifyContent: "center",
+            gap: "16px",
           }}
-          onClick={handleSubmit}
         >
-          Update Job
-        </Button>
-        <Modal
-          opened={isModalOpen}
-          onClose={() => setModalOpen(false)}
-          centered
-          size="lg"
-        >
-          <Box ml={40} mr={40} mb={40}>
-            <Title
-              ta="left"
-              order={1}
-              className={SFProRounded.className}
-              c="blue"
-              mb={10}
-            >
-              {ModalTitle ? ModalTitle : "Success!"}
-              {/* {searchParams?.message && searchParams.message == "Success" ? "Success!" : "Fail!"} */}
-            </Title>
-            <Text className={SFProRounded.className} c="dark" size="md">
-              {/* {searchParams?.message && searchParams.message == "Fail"?"Somthing went wrong Please try again!": ModalText?.length?ModalText:"The form has been submitted successfully!"} */}
-              {ModalText?.length
-                ? ModalText
-                : "The form has been updated successfully!"}
-            </Text>
-            <Button
-              style={buttonStyle}
-              onClick={() => {
-                setModalOpen(false);
-                setModalClose(true);
-              }}
-              mt="md"
-            >
-              Close
-            </Button>
-          </Box>
-        </Modal>
-      </Group>}
+          <Button
+            type="submit"
+            size="md"
+            style={{
+              backgroundColor: "#004A93",
+              color: "white",
+            }}
+            onClick={handleSubmit}
+          >
+            Update Job
+          </Button>
+          <Modal
+            opened={isModalOpen}
+            onClose={() => setModalOpen(false)}
+            centered
+            size="lg"
+          >
+            <Box ml={40} mr={40} mb={40}>
+              <Title
+                ta="left"
+                order={1}
+                className={SFProRounded.className}
+                c="blue"
+                mb={10}
+              >
+                {ModalTitle ? ModalTitle : "Success!"}
+                {/* {searchParams?.message && searchParams.message == "Success" ? "Success!" : "Fail!"} */}
+              </Title>
+              <Text className={SFProRounded.className} c="dark" size="md">
+                {/* {searchParams?.message && searchParams.message == "Fail"?"Somthing went wrong Please try again!": ModalText?.length?ModalText:"The form has been submitted successfully!"} */}
+                {ModalText?.length
+                  ? ModalText
+                  : "The form has been updated successfully!"}
+              </Text>
+              <Button
+                style={buttonStyle}
+                onClick={() => {
+                  setModalOpen(false);
+                  setModalClose(true);
+                }}
+                mt="md"
+              >
+                Close
+              </Button>
+            </Box>
+          </Modal>
+        </Group>
+      )}
     </div>
   );
 };

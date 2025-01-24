@@ -105,34 +105,69 @@ const DraftTable = ({   showPagination,pagename }: Props) => {
   useEffect(() => {
     getDrafts(activePage);
   },[activePage]);
-  const handleDiscardJob = async (draftId: string | undefined) => {
+  const handleDiscardJob = (draftId: string | undefined) => {
     setSelectedDraftId(draftId);
      setIsModalOpen(true);
   }
-  const handleDiscardDraft = async () => {
-    try {
-      setIsModalOpen(false); // Close the modal after discarding the draft
-      setIsLoading(true);
-      await deleteDraft(selectedDraftId);
-      // Refresh the drafts list
-      await getDrafts(activePage); // Assuming you have a function to fetch drafts
-    } catch (error) {
-      console.error('Error discarding draft:', error);
-    }
-    setIsLoading(false);
-  };
-
-    const getDrafts = async (page: any | undefined) => {
-      try {
-        setIsLoading(true);
-        const result = await fetchDraftsData({limit:20, step:page, pagename:pagename});
-        if(result && result.data)
-        setData(result.data);
-        setCount(result.count ?? 0);
-      } finally {
+  const handleDiscardDraft = () => {
+    setIsModalOpen(false); // Close the modal after discarding the draft
+    setIsLoading(true);
+  
+    deleteDraft(selectedDraftId)
+      .then(() => {
+        // Refresh the drafts list
+        return getDrafts(activePage); // Assuming you have a function to fetch drafts
+      })
+      .then(() => {
         setIsLoading(false);
-      }
-    }
+      })
+      .catch(error => {
+        console.error('Error discarding draft:', error);
+        setIsLoading(false);
+      });
+  };
+  
+  // const handleDiscardDraft = async () => {
+  //   try {
+  //     setIsModalOpen(false); // Close the modal after discarding the draft
+  //     setIsLoading(true);
+  //     await deleteDraft(selectedDraftId);
+  //     // Refresh the drafts list
+  //     await getDrafts(activePage); // Assuming you have a function to fetch drafts
+  //   } catch (error) {
+  //     console.error('Error discarding draft:', error);
+  //   }
+  //   setIsLoading(false);
+  // };
+  const getDrafts = (page: any | undefined) => {
+    setIsLoading(true);
+    
+    fetchDraftsData({ limit: 20, step: page, pagename: pagename })
+      .then(result => {
+        if (result && result.data) {
+          setData(result.data);
+        }
+        setCount(result.count ?? 0);
+      })
+      .catch(error => {
+        console.error('Error fetching drafts:', error);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
+  
+    // const getDrafts = async (page: any | undefined) => {
+    //   try {
+    //     setIsLoading(true);
+    //     const result = await fetchDraftsData({limit:20, step:page, pagename:pagename});
+    //     if(result && result.data)
+    //     setData(result.data);
+    //     setCount(result.count ?? 0);
+    //   } finally {
+    //     setIsLoading(false);
+    //   }
+    // }
 
   const rows =data &&  data.map(
     (
@@ -212,6 +247,7 @@ const DraftTable = ({   showPagination,pagename }: Props) => {
             ? new Date(job.created_at).toLocaleDateString("en-GB", {
                 day: "2-digit",
                 month: "short",
+                year: "numeric",
               })
             : "-"}
         </Table.Td>
@@ -318,7 +354,7 @@ const DraftTable = ({   showPagination,pagename }: Props) => {
           >
             <Table.Tr>
               <Table.Th style={{ textAlign: "center", whiteSpace: "nowrap" }}>
-                S.No
+                #
               </Table.Th>
               <Table.Th style={{ textAlign: "center", whiteSpace: "nowrap" }}>
                 JOBS

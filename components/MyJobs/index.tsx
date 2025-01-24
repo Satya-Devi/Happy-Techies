@@ -57,7 +57,7 @@ const renderStatus = (
   const currentDate = new Date();
   const deadlineDate = new Date(deadline || "");
 
-  return currentDate < deadlineDate && status !== "inactive"
+  return status !== "inactive"
     ? {
         text: "Active",
         color: "#34B04F",
@@ -110,41 +110,80 @@ const MyJobs = ({ showPagination, pagename }: Props) => {
   const [count, setCount] = useState(0);
 
   useEffect(() => {
+    console.log("oooooo",pagename)
     getData(activePage);
   }, [activePage]);
-
-  const handleMarkInactive = async (jobId: any) => {
-    try {
-      await markJobInactive(jobId);
-      // Refresh the jobs data
-      getData(activePage);
-    } catch (error) {
-      console.error("Error marking job as inactive:", error);
-    }
-  };
-  const deleteInactiveJob = async (jobId: any) => {
-    try {
-      await deleteJob(jobId);
-      // Refresh the jobs data
-      getData(activePage);
-    } catch (error) {
-      console.error("Error marking job as inactive:", error);
-    }
-  };
-  const getData = async (page: any | undefined) => {
-    try {
-      setIsLoading(true);
-      const result = await fetchJobsData({
-        limit: 20,
-        step: page,
-        pagename: pagename,
+  const handleMarkInactive = (jobId: any) => {
+    markJobInactive(jobId)
+      .then(() => {
+        // Refresh the jobs data
+        getData(activePage);
+      })
+      .catch((error) => {
+        console.error("Error marking job as inactive:", error);
       });
-      if (result && result.data) setData(result.data);
-      setCount(result.count ?? 0);
-    } finally {
-      setIsLoading(false);
-    }
   };
+  // const handleMarkInactive = async (jobId: any) => {
+  //   try {
+  //     await markJobInactive(jobId);
+  //     // Refresh the jobs data
+  //     getData(activePage);
+  //   } catch (error) {
+  //     console.error("Error marking job as inactive:", error);
+  //   }
+  // };
+  // const deleteInactiveJob = async (jobId: any) => {
+  //   try {
+  //     await deleteJob(jobId);
+  //     // Refresh the jobs data
+  //     getData(activePage);
+  //   } catch (error) {
+  //     console.error("Error marking job as inactive:", error);
+  //   }
+  // };
+  const deleteInactiveJob = (jobId:any) => {
+    deleteJob(jobId)
+      .then(() => {
+        // Refresh the jobs data
+        getData(activePage);
+      })
+      .catch((error) => {
+        console.error("Error marking job as inactive:", error);
+      });
+  };
+  // const getData = async (page: any | undefined) => {
+  //   try {
+  //     setIsLoading(true);
+  //     const result = await fetchJobsData({
+  //       limit: 20,
+  //       step: page,
+  //       pagename: pagename,
+  //     });
+  //     if (result && result.data) setData(result.data);
+  //     setCount(result.count ?? 0);
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
+  const getData = (page: any | undefined) => {
+    setIsLoading(true);
+    fetchJobsData({
+      limit: 20,
+      step: page,
+      pagename: pagename,
+    })
+      .then(result => {
+        if (result && result.data) setData(result.data);
+        setCount(result.count ?? 0);
+      })
+      .catch(error => {
+        console.error(error); // Handle any errors here if necessary
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
+  
 
   const rows =
     data &&
@@ -254,6 +293,7 @@ const MyJobs = ({ showPagination, pagename }: Props) => {
             ? new Date(job.created_at).toLocaleDateString("en-GB", {
                 day: "2-digit",
                 month: "short",
+                year: "numeric",
               })
             : "-"}
         </Table.Td>
@@ -273,6 +313,7 @@ const MyJobs = ({ showPagination, pagename }: Props) => {
             ? new Date(job.application_deadline).toLocaleDateString("en-GB", {
                 day: "2-digit",
                 month: "short",
+                year: "numeric",
               })
             : "-"}
         </Table.Td>
@@ -382,7 +423,7 @@ const MyJobs = ({ showPagination, pagename }: Props) => {
                   padding: "8px 16px",
                 }}
                 onClick={() =>
-                  router.push(`/edit-job?id=${job.id}&action=view`)
+                  router.push(`/edit-job?id=${job.id}&actions=view`)
                 }
               >
                 View Details
@@ -504,7 +545,7 @@ const MyJobs = ({ showPagination, pagename }: Props) => {
             >
               <Table.Tr>
                 <Table.Th style={{ textAlign: "center", whiteSpace: "nowrap" }}>
-                  S.No
+                  #
                 </Table.Th>
                 <Table.Th style={{ textAlign: "center", whiteSpace: "nowrap" }}>
                   JOBS

@@ -389,15 +389,23 @@ const ApplicantForm = () => {
       }
     }
   };
-  const handleInputChange = async (key: string, value: any) => {
+  const handleInputChange = (key: string, value: any) => {
     console.log("handle", key, value, formData);
+    
     if (key === "companyLogo" && value) {
       setImageFile(value);
     }
-
+  
     setFormData((prev) => ({ ...prev, [key]: value }));
-    await validateField(key, value);
+  
+    // Call validation without awaiting
+    validateField(key, value).then(() => {
+      console.log(`Validation completed for ${key}`);
+    }).catch((error) => {
+      console.error(`Validation failed for ${key}:`, error);
+    });
   };
+  
 
   return (
     <div>

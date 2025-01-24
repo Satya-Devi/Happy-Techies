@@ -29,7 +29,7 @@ export default async function PostJob({
   } else {
     redirect("/employers-login");
   }
-
+console.log("==========search", searchParams);
   return (
     <div>
       <Hero
@@ -38,10 +38,11 @@ export default async function PostJob({
         align="center"
         role="Employer" 
         page="my-jobs"
+        nav_from={searchParams?.nav_from}
       />
 
       <MyJobs 
-      // searchParams={searchParams}  
+     pagename={searchParams?.pagename}  
       showPagination={true} />
     </div>
   );

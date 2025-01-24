@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
 import Dashboard from "@/components/Dashboard/Dashboard";
 import Draft from "@/components/DraftSection/Draft";
+import { fetchJobsData} from "@/app/my-jobs/action";
 
 
 export default async function Overview() {
@@ -28,6 +29,7 @@ export default async function Overview() {
   } else {
     redirect("/employers-login");
   }
+  const {count}=await fetchJobsData({action:"Count"});
   return (
     <>
       <Hero
@@ -40,7 +42,7 @@ export default async function Overview() {
       />
       <div>
       
-      <Dashboard />
+    <Dashboard count={count}/> 
       <Draft />
     </div>
     </>

@@ -49,10 +49,13 @@ const validationSchema = Yup.object().shape({
   country: Yup.string().required("Country is required"),
 });
 interface PaymentFormProps {
-  setShowPayments: () => void;
-  handleSubmit: (data: any) => void;
+  setShowPayments?: () => void;
+  handleSubmit?: (data: any) => void;
 }
-const PaymentForm = ({ setShowPayments, handleSubmit }: PaymentFormProps) =>
+const PaymentForm = ({ setShowPayments = () => {}, 
+handleSubmit = () => {} 
+// setShowPayments, handleSubmit 
+}: PaymentFormProps) =>
   // { onSubmit }: { onSubmit: (data: any) => void }
   {
     const searchParams = useSearchParams();

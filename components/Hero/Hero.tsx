@@ -11,6 +11,7 @@ type HeroProps = {
   subtitle: string;
   role?: string;
   page?: string;
+  nav_from?: string;
   subpage?: string;
   align: "left" | "center" | "right";
   isHome?: boolean;
@@ -27,6 +28,7 @@ export function Hero({
   subtitle,
   role,
   page = "",
+  nav_from=",",
   align,
   isHome = false,
   isPartner = false,
@@ -60,7 +62,7 @@ export function Hero({
         (role === "Employer" ? (
           <div className={classes.header}>
             <div className={classes.backButtonContainer}>
-              {page && (page == "my-jobs" ) ? (
+              {page && (page == "my-jobs" && nav_from!="Dashboard" ) ? (
                 <div
                   style={{
                     fill: "#004A93",

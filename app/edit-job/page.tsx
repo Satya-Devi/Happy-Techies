@@ -97,14 +97,14 @@ export default async function EditJob({
   return (
     <div>
       <Hero
-        title={searchParams?.action=="view"?"Job Details":"Edit Job Listing"}
+        title={searchParams?.actions=="view"?"Job Details":"Edit Job Listing"}
         subtitle=""
         align="center"
         role="Employer"
         page="post-job"
       />
 
-      <EditJobForm searchParams={searchParams} onSubmit={signUp} data={data} action={searchParams.action}/>
+      <EditJobForm searchParams={searchParams} onSubmit={signUp} data={data} actions={searchParams.actions}/>
     </div>
   );
 }
