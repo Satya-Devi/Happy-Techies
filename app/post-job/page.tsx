@@ -41,6 +41,33 @@ export default async function PostJob({
     console.log("formattedDate", formattedDate, null);
     const supabase = createClient();
     if (formData?.jobId) {
+     
+  // Step 1: Get the employer logo URL from the jobs table
+  const { data:imgData, error:imgErr } = await supabase
+    .from('jobs')
+    .select('employer_logo')
+    .eq('id', formData?.jobId)
+    .single();  // Get a single record
+
+  if (imgErr) {
+    console.error('Error fetching employer logo:', imgErr);
+    // return false;
+  }
+
+  const imageUrl = imgData?.employer_logo;
+    if(imageUrl){
+      const match = imageUrl.match(/public\/[^\/]+\/(.+)/);
+      let url= match ? match[1] : null;
+      if(url){
+    const { data:imageData, error:imageErr } = await supabase
+    .storage
+    .from('images')
+    .remove([url]);
+
+  if (imageErr) {
+    console.error("Error deleting image:", imageErr.message);
+    return false;
+  }}} 
       const { data: updateData, error: updateError } = await supabase
         .from("jobs")
         .update({
@@ -77,9 +104,12 @@ export default async function PostJob({
         return {status:false};
       } else {
         console.log("Job updated successfully:", updateData);
+       
         return {id:updateData?.id, status:true};
       }
-    } else {
+
+    } 
+    else {
       const { data: insertData, error: insertError } = await supabase
         .from("jobs")
         .insert([

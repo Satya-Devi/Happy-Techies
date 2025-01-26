@@ -51,15 +51,17 @@ const validationSchema = Yup.object().shape({
 interface PaymentFormProps {
   setShowPayments?: () => void;
   handleSubmit?: (data: any) => void;
+  payment?: boolean;
 }
 const PaymentForm = ({ setShowPayments = () => {}, 
-handleSubmit = () => {} 
+handleSubmit = () => {} ,
+payment
 // setShowPayments, handleSubmit 
 }: PaymentFormProps) =>
   // { onSubmit }: { onSubmit: (data: any) => void }
   {
     const searchParams = useSearchParams();
-    const action = searchParams.get("action");
+    const action = payment? "payment" : searchParams.get("action") ;
     const [formData, setFormData] = useState({
       employersName: "",
       companyName: "",
@@ -84,33 +86,38 @@ handleSubmit = () => {}
       handleSubmit({});
       setWarningModal(true);
     };
-    const validateForm = async (): Promise<boolean> => {
-      try {
+    const validateForm = (): Promise<boolean> => {
+      return new Promise((resolve, reject) => {
         // Filter out fields with no data before validation
         const filteredFormData = Object.fromEntries(
           Object.entries(formData).filter(
             ([key, value]) => value !== null && value !== ""
           )
         );
-
-        await validationSchema.validate(filteredFormData, {
-          abortEarly: false,
-        });
-        setErrors({});
-        return true;
-      } catch (validationErrors) {
-        if (validationErrors instanceof Yup.ValidationError) {
-          const formErrors: { [key: string]: string } = {};
-          validationErrors.inner.forEach((error) => {
-            if (error.path) {
-              formErrors[error.path] = error.message;
+    
+        validationSchema
+          .validate(filteredFormData, {
+            abortEarly: false,
+          })
+          .then(() => {
+            setErrors({}); // Clear any previous errors
+            resolve(true); // Resolve as valid
+          })
+          .catch((validationErrors) => {
+            if (validationErrors instanceof Yup.ValidationError) {
+              const formErrors: { [key: string]: string } = {};
+              validationErrors.inner.forEach((error) => {
+                if (error.path) {
+                  formErrors[error.path] = error.message;
+                }
+              });
+              setErrors(formErrors); // Set the errors
             }
+            reject(false); // Reject as invalid
           });
-          setErrors(formErrors);
-        }
-        return false;
-      }
+      });
     };
+    
 
     const [promoteModalOpened, setPromoteModalOpened] = useState(false);
 
@@ -138,7 +145,7 @@ handleSubmit = () => {}
       setShowPayments();
     }
     else{
-      router.push("/my-jobs");
+      router.push("/my-jobs?nav_from=payment");
     }}
     return (
       <>

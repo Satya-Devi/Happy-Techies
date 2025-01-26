@@ -62,7 +62,7 @@ export function Hero({
         (role === "Employer" ? (
           <div className={classes.header}>
             <div className={classes.backButtonContainer}>
-              {page && (page == "my-jobs" && nav_from!="Dashboard" ) ? (
+              {page && (page == "my-jobs" && nav_from=="payment" ) ? (
                 <div
                   style={{
                     fill: "#004A93",

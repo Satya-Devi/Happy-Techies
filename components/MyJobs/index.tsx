@@ -508,7 +508,8 @@ const MyJobs = ({ showPagination, pagename }: Props) => {
   return (
     <Box mx="auto" p="lg" style={{ maxWidth: "89%" }}>
       <div className="scrollbar_hidden">
-        {isLoading ? (
+        {isLoading ? 
+        (
           <div
             style={{
               display: "flex",

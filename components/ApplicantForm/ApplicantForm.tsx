@@ -367,31 +367,41 @@ const ApplicantForm = () => {
     }
   }, [isModalClose]);
 
-  const validateField = async (fieldName: string, value: any) => {
-    try {
-      console.log("Validation", value);
-      if (fieldName === "salaryMax")
-        await draftValidationSchema.validateAt(fieldName, {
-          [fieldName]: value,
-          salaryMin: formData.salaryMin,
-        });
-      else
-        await draftValidationSchema.validateAt(fieldName, {
-          [fieldName]: value,
-        });
-      setErrors((prev) => {
-        const { [fieldName]: _, ...rest } = prev; // Remove the field from the errors object
-        return rest; // Return the new object without the specified field
+  const validateField = (fieldName: string, value: any): Promise<void> => {
+    console.log("Validation", value);
+  
+    let validationPromise: Promise<void>;
+  
+    if (fieldName === "salaryMax") {
+      validationPromise = draftValidationSchema.validateAt(fieldName, {
+        [fieldName]: value,
+        salaryMin: formData.salaryMin,
       });
-    } catch (error) {
-      if (error instanceof Yup.ValidationError) {
-        setErrors((prev) => ({ ...prev, [fieldName]: error.message }));
-      }
+    } else {
+      validationPromise = draftValidationSchema.validateAt(fieldName, {
+        [fieldName]: value,
+      });
     }
+  
+    // Ensure the validation promise always returns a Promise
+    return validationPromise
+      .then(() => {
+        setErrors((prev) => {
+          const { [fieldName]: _, ...rest } = prev; // Remove the field from the errors object
+          return rest; // Return the new object without the specified field
+        });
+      })
+      .catch((error) => {
+        if (error instanceof Yup.ValidationError) {
+          setErrors((prev) => ({ ...prev, [fieldName]: error.message }));
+        }
+      });
   };
+  
+  
   const handleInputChange = (key: string, value: any) => {
     console.log("handle", key, value, formData);
-    
+  
     if (key === "companyLogo" && value) {
       setImageFile(value);
     }
@@ -405,6 +415,7 @@ const ApplicantForm = () => {
       console.error(`Validation failed for ${key}:`, error);
     });
   };
+  
   
 
   return (

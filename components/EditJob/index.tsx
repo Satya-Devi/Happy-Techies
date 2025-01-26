@@ -17,7 +17,7 @@ import {
   TagsInput,
 } from "@mantine/core";
 import { IconCheck, IconHelpCircle, IconEdit } from "@tabler/icons-react";
-
+import { editJob } from "@/app/edit-job/action";
 import { DateInput } from "@mantine/dates";
 import { redirect } from "next/navigation";
 import * as Yup from "yup";
@@ -201,6 +201,7 @@ const EditJobForm = ({ searchParams, actions, onSubmit, data }: Props) => {
     formValue = new Date(data[0].application_deadline);
   const [action, setAction] = useState(actions);
   const [formData, setFormData] = useState({
+    id: data?.[0].id,
     employerName: data?.[0]?.company_name || "",
     employerWebsite: data?.[0]?.links[0] || "",
     jobTitle: data?.[0]?.job_title || "",
@@ -236,32 +237,32 @@ const EditJobForm = ({ searchParams, actions, onSubmit, data }: Props) => {
     }
   }, [isModalClose]);
   console.log("Modal45678", data, formData);
-  const validateField = async (fieldName: string, value: any) => {
-    try {
-      console.log("Validation", value);
-      if (fieldName === "salaryMax")
-        await validationSchema.validateAt(fieldName, {
-          [fieldName]: value,
-          salaryMin: formData.salaryMin,
+  const validateField = (fieldName: string, value: any) => {
+    console.log("Validation", value);
+    
+    const validationData = fieldName === "salaryMax" 
+      ? { [fieldName]: value, salaryMin: formData.salaryMin } 
+      : { [fieldName]: value };
+    
+    validationSchema.validateAt(fieldName, validationData)
+      .then(() => {
+        setErrors((prev) => {
+          const { [fieldName]: _, ...rest } = prev; // Remove the field from the errors object
+          return rest; // Return the new object without the specified field
         });
-      else
-        await validationSchema.validateAt(fieldName, {
-          [fieldName]: value,
-        });
-      setErrors((prev) => {
-        const { [fieldName]: _, ...rest } = prev; // Remove the field from the errors object
-        return rest; // Return the new object without the specified field
+      })
+      .catch((error) => {
+        if (error instanceof Yup.ValidationError) {
+          setErrors((prev) => ({ ...prev, [fieldName]: error.message }));
+        }
       });
-    } catch (error) {
-      if (error instanceof Yup.ValidationError) {
-        setErrors((prev) => ({ ...prev, [fieldName]: error.message }));
-      }
-    }
   };
-  const handleInputChange = async (key: string, value: any) => {
+  const handleInputChange = (key: string, value: any) => {
     setFormData((prev) => ({ ...prev, [key]: value }));
-    await validateField(key, value);
+    
+    validateField(key, value);
   };
+  
   // const validateForm = async (): Promise<boolean> => {
   //   try {
   //     // Filter out fields with no data before validation
@@ -285,44 +286,105 @@ const EditJobForm = ({ searchParams, actions, onSubmit, data }: Props) => {
   //     return false;
   //   }
   // };
-  const validateForm = async (): Promise<boolean> => {
-    try {
-      await validationSchema.validate(formData, { abortEarly: false });
-      setErrors({});
-      return true;
-    } catch (validationErrors) {
-      if (validationErrors instanceof Yup.ValidationError) {
-        const formErrors: { [key: string]: string } = {};
-        validationErrors.inner.forEach((error) => {
-          formErrors[error.path || ""] = error.message;
-        });
-        setErrors(formErrors);
-      }
-      return false;
-    }
+  const validateForm = (): Promise<boolean> => {
+    return validationSchema
+      .validate(formData, { abortEarly: false })
+      .then(() => {
+        setErrors({});
+        return true;
+      })
+      .catch((validationErrors) => {
+        if (validationErrors instanceof Yup.ValidationError) {
+          const formErrors: { [key: string]: string } = {};
+          validationErrors.inner.forEach((error) => {
+            formErrors[error.path || ""] = error.message;
+          });
+          setErrors(formErrors);
+        }
+        return false;
+      });
   };
-  const handleSubmit = async () => {
-    const isValid = await validateForm();
-    console.log("Success!!!!!!!!!!!!!1111", isValid);
-    if (isValid || Object.keys(errors).length === 0) {
-      let data = formData;
+  // const handleSubmit = () => {
+  //   validateForm()
+  //     .then((isValid) => {
+  //       console.log("Success!!!!!!!!!!!!!1111", isValid);
+  //       if (isValid || Object.keys(errors).length === 0) {
+  //         let data = formData;
+  
+  //         editJob(data,formData.id)
+  //           .then((res : any) => {
+  //             console.log("Success!!!!!!!!!!!!!", res);
+  //             if (res) {
+  //               console.log("Success", res);
+  //               setModalOpen(true);
+  //             } else {
+  //               setModalOpen(true);
+  //               setModalTitle("Fail!");
+  //               setModalText("Something went wrong!");
+  //             }
+  //             console.log("Form submitted successfully1:", data, searchParams);
+  //             console.log("Form submitted successfully:", formData);
+  //           })
+  //           .catch((submitError: Error) => {
+  //             console.error("Error submitting form:", submitError);
+  //             setModalOpen(true);
+  //             setModalTitle("Fail!");
+  //             setModalText("Something went wrong during submission!");
+  //           });
+  //       } else {
+  //         console.log("Form has errors:", errors);
+  //       }
 
-      let res = await onSubmit(data);
-      console.log("Success!!!!!!!!!!!!!", res);
-      if (res) {
-        console.log("Success", res);
-        setModalOpen(true);
-      } else {
-        setModalOpen(true);
-        setModalTitle("Fail!");
-        setModalText("Somthing went wrong!");
-      }
-      console.log("Form submitted successfully1:", data, searchParams);
-      console.log("Form submitted successfully:", formData);
-    } else {
-      console.log("Form has errors:", errors);
-    }
+  //     });      .catch((validationError) => {
+  //       console.error("Validation error:", validationError);
+  //     });      .catch((error) => {
+  //       console.error("Validation error:", error);
+  //     });      .catch((validationError) => {
+  //       console.error("Validation error:", validationError);
+  //     });
+  // };
+  const handleSubmit = () => {
+    validateForm()
+      .then((isValid) => {
+        console.log("Validation result:", isValid);
+        
+        if (isValid || Object.keys(errors).length === 0) {
+          let data = formData;
+  
+          editJob(data, formData.id)
+            .then((res) => {
+              console.log("Success response:", res);
+              if (res) {
+                console.log("Success!", res);
+                setModalOpen(true);
+              } else {
+                setModalOpen(true);
+                setModalTitle("Fail!");
+                setModalText("Something went wrong!");
+              }
+            })
+            .catch((error) => {
+              if (error instanceof Error) {
+                console.error("Error during submission:", error.message);
+              } else {
+                console.error("Unexpected error:", error);
+              }
+              setModalOpen(true);
+              setModalTitle("Fail!");
+              setModalText("Something went wrong!");
+            });
+  
+          console.log("Form submitted successfully:", data);
+        } else {
+          console.log("Form has errors:", errors);
+        }
+      })
+      .catch((validationError) => {
+        console.error("Validation failed:", validationError);
+      });
   };
+  
+  
   let formattedDeadline = null;
   if (data[0]?.application_deadline) {
     formattedDeadline = new Date(data[0]?.application_deadline)

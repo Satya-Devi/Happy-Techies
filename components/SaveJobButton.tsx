@@ -12,7 +12,7 @@ type SaveJobButtonProps = {
 };
 
 export default function SaveJobButton({ userId, job }: SaveJobButtonProps) {
-  const handleSaveJob = async () => {
+  const handleSaveJob = () => {
     try {
       const jobData: JobData = {
         id: job.id, // Use the id from Job for JobData id
@@ -26,20 +26,31 @@ export default function SaveJobButton({ userId, job }: SaveJobButtonProps) {
         employer_logo: job.employer_logo,
         job_id: job.id, // Use the id as job_id, or set it to null if it's not available
       };
-      await saveJob(userId, jobData);
-      notifications.show({
-        title: "Job saved!",
-        message: "The job has been saved successfully!",
-        color: "green",
-      });
+  
+      saveJob(userId, jobData)
+        .then(() => {
+          notifications.show({
+            title: "Job saved!",
+            message: "The job has been saved successfully!",
+            color: "green",
+          });
+        })
+        .catch(() => {
+          notifications.show({
+            title: "Oops...",
+            message: "Unable to save the job. Please try again later.",
+            color: "red",
+          });
+        });
     } catch (err) {
       notifications.show({
         title: "Oops...",
-        message: "Unable to save the job. Please try again later.",
+        message: "An unexpected error occurred. Please try again later.",
         color: "red",
       });
     }
   };
+  
 
   return (
     <Button

@@ -23,7 +23,7 @@ export default function ChatHero() {
   const isMobile = useMediaQuery("(max-width: 768px)");
   const [value, setValue] = useState("");
 
-  const handleClick = async () => {
+  const handleClick =  () => {
     try {
       if (!value.trim()) {
         alert("Please enter a query before searching.");

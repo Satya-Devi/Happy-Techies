@@ -23,7 +23,7 @@ import { useRouter } from "next/navigation";
 import * as Yup from "yup";
 import Search from "../Search";
 import PaymentForm from "@/components/Payment/Payment";
-
+import {saveJob} from "@/app/post-job/action";
 const validationSchema = Yup.object().shape({
   // imageUrl: Yup.mixed()
   //   .required("Company logo is required")
@@ -195,7 +195,7 @@ const validationSchema = Yup.object().shape({
   //   .min(new Date(), "Deadline must not be less than today")
   //   .required("Deadline is required"),
     deadline: Yup.date()
-  .nullable()
+  // .nullable()
   .required("Deadline is required")
   .test(
     "is-future-date",
@@ -339,7 +339,6 @@ const draftValidationSchema = Yup.object().shape({
   //   .nullable(),
     deadline: Yup.date()
   .nullable()
-  .required("Deadline is required")
   .test(
     "is-future-date",
     "Deadline must not be less than today",
@@ -468,100 +467,181 @@ const EmpJobForm = ({ searchParams, onSubmit, data }: Props) => {
     }
   }, []);
 
-  const handleImageUpload = async (file: File | null | string) => {
-    if (!file) return;
+  const handleImageUpload = (file:any) => {
+    if (!file) return Promise.reject(new Error("No file provided"));
+  
     if (file instanceof File) {
       const reader = new FileReader();
       reader.readAsDataURL(file);
-
+  
       return new Promise((resolve, reject) => {
-        reader.onload = async () => {
-          try {
-            const base64Data = reader.result;
-            const response = await fetch("/api/upload", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                file: base64Data,
-                fileName: file.name,
-              }),
-            });
-            console.log("RESPONESE", response);
-            if (response.ok) {
-              const data = await response.json();
+        reader.onload = () => {
+          const base64Data = reader.result;
+          
+          fetch("/api/upload", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              file: base64Data,
+              fileName: file.name,
+            }),
+          })
+            .then((response) => {
+              console.log("RESPONSE", response);
+              if (!response.ok) {
+                throw new Error("Upload failed");
+              }
+              return response.json();
+            })
+            .then((data) => {
               setFormData((prev) => ({ ...prev, ["imageUrl"]: data.url }));
               console.log("DataTATA", data);
-              // resolve({ message: "Upload successful!", data });
               resolve(data?.url);
-            } else {
-              reject(new Error("Upload failed"));
-            }
-          } catch (error) {
-            reject(error);
-          }
+            })
+            .catch((error) => {
+              console.error("Upload error:", error);
+              reject(error);
+            });
         };
-
+  
         reader.onerror = () => {
           reject(new Error("File reading failed"));
         };
       });
     }
+  
+    return Promise.reject(new Error("Invalid file type"));
   };
+  
 
-  const validateField = async (fieldName: string, value: any) => {
-    try {
-      console.log("Validation", value);
-      if (fieldName === "salaryMax")
-        await draftValidationSchema.validateAt(fieldName, {
-          [fieldName]: value,
-          salaryMin: formData.salaryMin,
-        });
-      else
-        await draftValidationSchema.validateAt(fieldName, {
-          [fieldName]: value,
-        });
-      setErrors((prev) => {
-        const { [fieldName]: _, ...rest } = prev; // Remove the field from the errors object
-        return rest; // Return the new object without the specified field
+  // const validateField = async (fieldName: string, value: any) => {
+  //   try {
+  //     console.log("Validation", value);
+  //     if (fieldName === "salaryMax")
+  //       await draftValidationSchema.validateAt(fieldName, {
+  //         [fieldName]: value,
+  //         salaryMin: formData.salaryMin,
+  //       });
+  //     else
+  //       await draftValidationSchema.validateAt(fieldName, {
+  //         [fieldName]: value,
+  //       });
+  //     setErrors((prev) => {
+  //       const { [fieldName]: _, ...rest } = prev; // Remove the field from the errors object
+  //       return rest; // Return the new object without the specified field
+  //     });
+  //   } catch (error) {
+  //     if (error instanceof Yup.ValidationError) {
+  //       setErrors((prev) => ({ ...prev, [fieldName]: error.message }));
+  //     }
+  //   }
+  // };
+  const validateField = (fieldName: string, value:any) => {
+    console.log("Validation", value);
+  
+    let validationPromise;
+  
+    if (fieldName === "salaryMax") {
+      validationPromise = draftValidationSchema.validateAt(fieldName, {
+        [fieldName]: value,
+        salaryMin: formData.salaryMin,
       });
-    } catch (error) {
-      if (error instanceof Yup.ValidationError) {
-        setErrors((prev) => ({ ...prev, [fieldName]: error.message }));
-      }
+    } else {
+      validationPromise = draftValidationSchema.validateAt(fieldName, {
+        [fieldName]: value,
+      });
     }
+  
+    return validationPromise
+      .then(() => {
+        setErrors((prev) => {
+          const { [fieldName]: _, ...rest } = prev; // Remove the field from the errors object
+          return rest; // Return the new object without the specified field
+        });
+      })
+      .catch((error) => {
+        if (error instanceof Yup.ValidationError) {
+          setErrors((prev) => ({ ...prev, [fieldName]: error.message }));
+        }
+      });
   };
-  const handleInputChange = async (key: string, value: any) => {
+  
+  // const handleInputChange = async (key: string, value: any) => {
+  //   console.log("handle", key, value, formData);
+  //   if (key === "imageUrl" && value) {
+  //     setImageFile(value);
+  //     setFormData((prev) => ({ ...prev, ["imageUrl"]: value }));
+  //   }
+
+  //   setFormData((prev) => ({ ...prev, [key]: value }));
+  //   await validateField(key, value);
+  // };
+
+  const handleInputChange = (key:string, value:any) => {
     console.log("handle", key, value, formData);
+    
     if (key === "imageUrl" && value) {
       setImageFile(value);
       setFormData((prev) => ({ ...prev, ["imageUrl"]: value }));
     }
-
+  
     setFormData((prev) => ({ ...prev, [key]: value }));
-    await validateField(key, value);
+  
+    validateField(key, value)
+      .then(() => {
+        console.log(`Validation succeeded for ${key}`);
+      })
+      .catch((error) => {
+        console.error(`Validation failed for ${key}:`, error);
+      });
   };
+  
 
-  const validateForm = async (): Promise<boolean> => {
-    try {
-      await validationSchema.validate(formData, { abortEarly: false });
-      console.log("NOOOOOO ERRRRRORRRRS")
-      setErrors({});
-      return true;
-    } catch (validationErrors) {
-      console.log("ERROR: " + validationErrors)
-      if (validationErrors instanceof Yup.ValidationError) {
-        const formErrors: { [key: string]: string } = {};
-        validationErrors.inner.forEach((error) => {
-          formErrors[error.path || ""] = error.message;
-        });
-        console.log("formErrorssss", formErrors);
-        setErrors(formErrors);
-      }
-      return false;
-    }
+  // const validateForm = async (): Promise<boolean> => {
+  //   try {
+  //     await validationSchema.validate(formData, { abortEarly: false });
+  //     console.log("NOOOOOO ERRRRRORRRRS")
+  //     setErrors({});
+  //     return true;
+  //   } catch (validationErrors) {
+  //     console.log("ERROR: " + validationErrors)
+  //     if (validationErrors instanceof Yup.ValidationError) {
+  //       const formErrors: { [key: string]: string } = {};
+  //       validationErrors.inner.forEach((error) => {
+  //         formErrors[error.path || ""] = error.message;
+  //       });
+  //       console.log("formErrorssss", formErrors);
+  //       setErrors(formErrors);
+  //     }
+  //     return false;
+  //   }
+  // };
+  
+  
+  const validateForm = (): Promise<boolean> => {
+    return validationSchema.validate(formData, { abortEarly: false })
+      .then(() => {
+        console.log("NOOOOOO ERRRRRORRRRS");
+        setErrors({});
+        return true;
+      })
+      .catch((validationErrors) => {
+        console.log("ERROR: " + validationErrors);
+        if (validationErrors instanceof Yup.ValidationError) {
+          const formErrors :{ [key: string]: string } = {};
+          validationErrors.inner.forEach((error) => {
+            formErrors[error.path || ""] = error.message;
+          });
+          console.log("formErrorssss", formErrors);
+          setErrors(formErrors);
+        }
+        return false;
+      });
   };
+  
+  
   const hasAtLeastOneField = () => {
     const { isDraft, ...dataToCheck } = formData;
     return Object.entries(dataToCheck).some(([key, value]) => {
@@ -576,115 +656,243 @@ const EmpJobForm = ({ searchParams, onSubmit, data }: Props) => {
   };
   console.log("================================", errors);
 
-  const handleSubmit = async ({
-    is_draft,
-    action,
-  }: {
-    is_draft?: boolean;
-    action?: string;
-  }) => {
-    console.log("submit$$$$$$$---", formData, is_draft);
-    let isValid;
-    if (is_draft) {
-      isValid = Object.keys(errors).length === 0;
-    } else {
-      console.log("VALIDATION",Object.keys(errors).length,errors);
-      isValid = await validateForm();
-    }
-    console.log("isValid&&&&&&&&&&&", isValid, errors);
-    if (isValid) {
-      let data = formData;
-      // data.companyLogo = (formData?.companyLogo as any)?.name || null;
-      // data.companyLogo = (formData?.companyLogo as any)?.name || null;
-      //data.companyLogo = formData?.companyLogo?.name;
-      data.isDraft = action && action === "payment" ? true : is_draft ?? false;
-      if (!is_draft) {
-        if (imageFile) {
-          const url = await handleImageUpload(imageFile);
-          data.imageUrl = typeof url == "string" ? url : "";
-        }
-        if (searchParams && searchParams.id) {
-          data.jobId = searchParams.id;
-        }
-        if(showPayment) {
-          let res = await onSubmit(data);
+  // const handleSubmit = async ({
+  //   is_draft,
+  //   action,
+  // }: {
+  //   is_draft?: boolean;
+  //   action?: string;
+  // }) => {
+  //   console.log("submit$$$$$$$---", formData, is_draft);
+  //   let isValid;
+  //   if (is_draft) {
+  //     isValid = Object.keys(errors).length === 0;
+  //   } else {
+  //     console.log("VALIDATION",Object.keys(errors).length,errors);
+  //     isValid = await validateForm();
+  //   }
+  //   console.log("isValid&&&&&&&&&&&", isValid, errors);
+  //   if (isValid) {
+  //     let data = formData;
+  //     // data.companyLogo = (formData?.companyLogo as any)?.name || null;
+  //     // data.companyLogo = (formData?.companyLogo as any)?.name || null;
+  //     //data.companyLogo = formData?.companyLogo?.name;
+  //     data.isDraft = action && action === "payment" ? true : is_draft ?? false;
+  //     if (!is_draft) {
+  //       if (imageFile) {
+  //         const url = await handleImageUpload(imageFile);
+  //         data.imageUrl = typeof url == "string" ? url : "";
+  //       }
+  //       if (searchParams && searchParams.id) {
+  //         data.jobId = searchParams.id;
+  //       }
+  //       if(showPayment) {
+  //         let res = await onSubmit(data);
 
-        console.log("Success", res);
-        if (res && "status" in res && res.status) {
+  //       console.log("Success", res);
+  //       if (res && "status" in res && res.status) {
           
-          // router.push("/payment");
-          // return redirect("/payment");
-        }
-          // setShowPayment(false);
-        }
-        else{
-        setShowPayment(true);
-      }
+  //         // router.push("/payment");
+  //         // return redirect("/payment");
+  //       }
+  //         // setShowPayment(false);
+  //       }
+  //       else{
+  //       setShowPayment(true);
+  //     }
         
+  //     } else {
+  //       if (imageFile) {
+  //         const url = await handleImageUpload(imageFile);
+  //         data.imageUrl = typeof url == "string" ? url : "";
+  //         console.log("Image Upload111", formData);
+  //       }
+  //       if (searchParams && searchParams.id) {
+  //         data.jobId = searchParams.id;
+  //       }
+  //       // let res = true;
+  //       let res = await onSubmit(data);
+
+  //       console.log("Success", res);
+  //       if (res && "status" in res && res.status) {
+  //         console.log("Success", res);
+  //         setModalOpen(true);
+  //         setFormData({
+  //           companyLogo: null,
+  //           employerName: "",
+  //           employerWebsite: "",
+  //           jobTitle: "",
+  //           jobType: "",
+  //           solutionArea: "",
+  //           jobLocation: "",
+  //           workplaceType: "",
+  //           salaryMin: "",
+  //           salaryMax: "",
+  //           experience: "",
+  //           deadline: null,
+  //           skills: [],
+  //           jobDescription: "",
+  //           isDraft: false,
+  //           imageUrl: "",
+
+  //           jobId: "",
+  //         });
+  //       } else {
+  //         setModalOpen(true);
+  //         setModalTitle("Fail!");
+
+  //         setModalText("Something went wrong!");
+  //       }
+  //     }
+  //     console.log("Form submitted successfully1:", data, searchParams);
+
+  //     console.log("Form submitted successfully:", formData);
+  //   } else {
+  //     console.log("Form has errors:", errors);
+  //   }
+  // };
+  
+  
+  const handleSubmit = ({ is_draft, action }: { is_draft?: boolean; action?: string }): Promise<void> => {
+    return new Promise((resolve, reject) => {
+      console.log("submit$$$$$$$---", formData, is_draft);
+      let isValidPromise;
+  
+      if (is_draft) {
+        isValidPromise = Promise.resolve(Object.keys(errors).length === 0);
       } else {
-        if (imageFile) {
-          const url = await handleImageUpload(imageFile);
-          data.imageUrl = typeof url == "string" ? url : "";
-          console.log("Image Upload111", formData);
-        }
-        if (searchParams && searchParams.id) {
-          data.jobId = searchParams.id;
-        }
-        // let res = true;
-        let res = await onSubmit(data);
-
-        console.log("Success", res);
-        if (res && "status" in res && res.status) {
-          console.log("Success", res);
-          setModalOpen(true);
-          setFormData({
-            companyLogo: null,
-            employerName: "",
-            employerWebsite: "",
-            jobTitle: "",
-            jobType: "",
-            solutionArea: "",
-            jobLocation: "",
-            workplaceType: "",
-            salaryMin: "",
-            salaryMax: "",
-            experience: "",
-            deadline: null,
-            skills: [],
-            jobDescription: "",
-            isDraft: false,
-            imageUrl: "",
-
-            jobId: "",
-          });
-        } else {
-          setModalOpen(true);
-          setModalTitle("Fail!");
-
-          setModalText("Something went wrong!");
-        }
+        console.log("VALIDATION", Object.keys(errors).length, errors);
+        isValidPromise = validateForm();
       }
-      console.log("Form submitted successfully1:", data, searchParams);
+  
+      isValidPromise
+        .then((isValid) => {
+          console.log("isValid&&&&&&&&&&&", isValid, errors);
+          if (isValid) {
+            let data = formData;
+            data.isDraft = action === "payment" ? true : is_draft ?? false;
+  
+            let uploadPromise = Promise.resolve();
+  
+            if (!is_draft && imageFile) {
+              uploadPromise = handleImageUpload(imageFile).then((url) => {
+                data.imageUrl = typeof url === "string" ? url : "";
+              });
+            }
+  
+            uploadPromise
+              .then(() => {
+                if (searchParams?.id) {
+                  data.jobId = searchParams.id;
+                }
+  console.log("sasat33",is_draft)
 
-      console.log("Form submitted successfully:", formData);
-    } else {
-      console.log("Form has errors:", errors);
-    }
+                if (!is_draft ){
+                  if( showPayment) {
+                  console.log("sasat2")
+                  return saveJob(data).then((res) => {
+                    console.log("Success", res);
+                    if (res && 'status' in res && res.status) {
+                      resolve();
+                    } 
+                  });
+                }
+                else {
+                  console.log("sasat1")
+                  setShowPayment(true);
+                  reject("Failed to submit job.");
+                }
+              } else {
+                  return saveJob(data).then((res) => {
+                    console.log("Success", res);
+                    if (res && 'status' in res && res.status) {
+                      setModalOpen(true);
+                      setFormData({
+                        companyLogo: null,
+                        employerName: "",
+                        employerWebsite: "",
+                        jobTitle: "",
+                        jobType: "",
+                        solutionArea: "",
+                        jobLocation: "",
+                        workplaceType: "",
+                        salaryMin: "",
+                        salaryMax: "",
+                        experience: "",
+                        deadline: null,
+                        skills: [],
+                        jobDescription: "",
+                        isDraft: false,
+                        imageUrl: "",
+                        jobId: "",
+                      });
+                      resolve();
+                    } else {
+                      setModalOpen(true);
+                      setModalTitle("Fail!");
+                      setModalText("Something went wrong!");
+                      reject("Job submission failed.");
+                    }
+                  });                }
+              })
+              .then(() => {
+                console.log("Form submitted successfully1:", data, searchParams);
+                console.log("Form submitted successfully:", formData);
+              })
+              .catch((error) => {
+                console.error("Error during submission:", error);
+                setModalOpen(true);
+                setModalTitle("Fail!");
+                setModalText("Something went wrong!");
+                reject(error);
+              });
+          } else {
+            console.log("Form has errors:", errors);
+            reject("Form validation failed.");
+          }
+        });
+    });
   };
-  const handleDraft = async () => {
-    console.log("Form 6789saved successfully");
-    setFormData((prev) => ({ ...prev, ["isDraft"]: true }));
+  
+   
+  
+  
+  
+  // const handleDraft = async () => {
+  //   console.log("Form 6789saved successfully");
+  //   setFormData((prev) => ({ ...prev, ["isDraft"]: true }));
+  //   setModalText("Job has been successfully saved as a draft!");
+  //   console.log("Form 6789saved successfully", hasAtLeastOneField());
+  //   if (hasAtLeastOneField()) {
+  //     handleSubmit({ is_draft: true });
+  //   } else {
+  //     setModalText("Please enter at least one field to save as a draft.");
+
+  //     setWarningModal(true);
+  //   }
+  // };
+  const handleDraft = () => {
+    console.log("Form 6789 saved successfully");
+  
+    setFormData((prev) => ({ ...prev, isDraft: true }));
     setModalText("Job has been successfully saved as a draft!");
-    console.log("Form 6789saved successfully", hasAtLeastOneField());
+    
+    console.log("Form 6789 saved successfully", hasAtLeastOneField());
+  
     if (hasAtLeastOneField()) {
-      handleSubmit({ is_draft: true });
+      handleSubmit({ is_draft: true })
+        .then(() => {
+          console.log("Draft saved successfully.");
+        })
+        .catch((error) => {
+          console.error("Error while saving draft:", error);
+        });
     } else {
       setModalText("Please enter at least one field to save as a draft.");
-
       setWarningModal(true);
     }
   };
-
+  
   interface ImagePreviewWrapperProps {
     file: File | string | null;
   }
@@ -742,7 +950,7 @@ const showPaymentpage=()=>{
   return showPayment ? (
     <div>
       {/* <PaymentForm setShowPayment={setShowPayment} handleSubmit={handleSubmit} /> */}
-      <PaymentForm setShowPayments={showPaymentpage} handleSubmit={handleSubmit} />
+      <PaymentForm setShowPayments={showPaymentpage} handleSubmit={handleSubmit} payment={true} />
 
     </div>
   ) : (

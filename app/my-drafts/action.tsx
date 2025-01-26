@@ -28,7 +28,7 @@ export async function fetchDraftsData(pageData: any) {
   return { data, count };
 }
 
-export async function deleteDraft(draftId: any) {
+export async function deleteDraft(draftId: any,imageId: string|undefined|null) {
  
     
     const { data, error } = await supabase
@@ -41,6 +41,20 @@ export async function deleteDraft(draftId: any) {
     if (error) {
       throw error;
     }
+    console.log("DDDDDDAAAAATTTTAAAAaa",imageId);
+    if(imageId){
+      const match = imageId.match(/public\/[^\/]+\/(.+)/);
+      let url= match ? match[1] : null;
+      if(url){
+    const { data:imageData, error:imageErr } = await supabase
+    .storage
+    .from('images')
+    .remove([url]);
+
+  if (imageErr) {
+    console.error("Error deleting image:", imageErr.message);
+    return false;
+  }}}
   
     console.log("DDDDDDAAAAATTTTAAAA",data);
     return data;

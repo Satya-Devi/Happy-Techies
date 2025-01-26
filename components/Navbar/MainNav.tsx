@@ -27,7 +27,7 @@ import {
 } from "@tabler/icons-react";
 
 // import {getUser, getEmpUser, signOut, empSignOut} from "@/components/EmpUser/empuser"
-export default async function MainNav({
+export default  function MainNav({
   children,
   role,
   page,

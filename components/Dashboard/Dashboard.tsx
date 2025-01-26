@@ -1,86 +1,4 @@
-// 'use client';
-// import { useState, useEffect } from 'react';
-// import { ViewAllButton } from "./ViewAllButton";
-// import MyJobs from "../MyJobs";
-// import { Container, Text, Box } from "@mantine/core";
-// import { fetchJobsData} from "@/app/my-jobs/action";
-// import { useRouter } from "next/navigation";
-// import Loading from "@/app/loading";
-// import DashboardHeader from "@/components/DashboardHeader/DashboardHeader";
-// export default async function Dashboard(
-// //   {
-// //   searchParams,
-// // }: {
-// //   searchParams: { [key: string]: string };
-// // }
-// ) {
 
-//   // const [jobsCount, setJobsCount] = useState(0);
-//   // const [loading, setLoading] = useState(true);
-//   // const [error, setError] = useState(null);
-
-//   // function fetchJobs() {
-//   //   setLoading(true);
-  
-//   //   fetchJobsData({ action: 'Count' })
-//   //     .then((result) => {
-//   //       if (result.error) {
-//   //         throw new Error(result.error.message);
-//   //       }
-//   //       setJobsCount(result?.count || 0);
-//   //     })
-//   //     .catch((err) => {
-//   //       setError(err);
-//   //     })
-//   //     .finally(() => {
-//   //       setLoading(false);
-//   //     });
-//   // }
-  
-
-//   // useEffect(() => {
-//   //   fetchJobs();
-//   // }, []);
-// //const result = await fetchJobsData({pagename:"Dashboard"});
-// const router = useRouter();
- 
-  
-//   return (
-    
-//     <div> 
-       
-     
-//      <DashboardHeader/>
-//      <Box
-//         mx="auto"
-//         style={{
-//           maxWidth: "85%",
-//           display: "flex",
-//           flexDirection: "row",
-//           justifyContent: "space-between",
-//           alignItems: "center",
-//         }}
-//       >
-//         <div
-//           style={{
-//             fontSize: "23px",
-//             fontWeight: 600,
-//             color: "#000",
-//           }}
-//         >
-//           Recently Posted Jobs
-//         </div>
-//         <ViewAllButton redirectUrl={"/my-jobs?nav_from=Dashboard"} />
-//       </Box>
-//       <MyJobs
-//         pagename={"overview"}
-//         showPagination={false}
-//       />
-    
-//     </div>
-//     )
-  
-// }
 'use client';
 import { useState, useEffect } from 'react';
 import { ViewAllButton } from "./ViewAllButton";
@@ -214,7 +132,7 @@ const router = useRouter();
           >
             <div
 
-            onClick={() => router.push(`/my-jobs?pagename=Dashboard&nav_from=Dashboard`)}
+            onClick={() => router.push(`/my-jobs?pagename=Dashboard`)}
               style={{
               cursor: "pointer",
                 display: "flex",
@@ -329,7 +247,7 @@ const router = useRouter();
         >
           Recently Posted Jobs
         </div>
-        <ViewAllButton redirectUrl={"/my-jobs?nav_from=Dashboard"} />
+        <ViewAllButton redirectUrl={"/my-jobs"} />
       </Box>
       <MyJobs
         pagename={"overview"}

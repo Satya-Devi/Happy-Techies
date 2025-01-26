@@ -85,6 +85,7 @@ type Props = {
 interface JobRowData {
   id?: string;
   job_title?: string;
+  employer_logo?: string;
   employment_type?: string;
   job_location?: string;
   created_at?: string;
@@ -99,13 +100,16 @@ const DraftTable = ({   showPagination,pagename }: Props) => {
   const [data, setData] = useState<JobRowData[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedDraftId, setSelectedDraftId] = useState<string | null | undefined>(null);
+  const [imageId, setimageId] = useState<string | null | undefined>(null);
+
   // const [data, setData] = useState([]);
   const [count, setCount] = useState(0);
 
   useEffect(() => {
     getDrafts(activePage);
   },[activePage]);
-  const handleDiscardJob = (draftId: string | undefined) => {
+  const handleDiscardJob = (draftId: string | undefined,imageId: string | undefined | null) => {
+    setimageId(imageId);
     setSelectedDraftId(draftId);
      setIsModalOpen(true);
   }
@@ -113,7 +117,7 @@ const DraftTable = ({   showPagination,pagename }: Props) => {
     setIsModalOpen(false); // Close the modal after discarding the draft
     setIsLoading(true);
   
-    deleteDraft(selectedDraftId)
+    deleteDraft(selectedDraftId,imageId)
       .then(() => {
         // Refresh the drafts list
         return getDrafts(activePage); // Assuming you have a function to fetch drafts
@@ -127,18 +131,7 @@ const DraftTable = ({   showPagination,pagename }: Props) => {
       });
   };
   
-  // const handleDiscardDraft = async () => {
-  //   try {
-  //     setIsModalOpen(false); // Close the modal after discarding the draft
-  //     setIsLoading(true);
-  //     await deleteDraft(selectedDraftId);
-  //     // Refresh the drafts list
-  //     await getDrafts(activePage); // Assuming you have a function to fetch drafts
-  //   } catch (error) {
-  //     console.error('Error discarding draft:', error);
-  //   }
-  //   setIsLoading(false);
-  // };
+ 
   const getDrafts = (page: any | undefined) => {
     setIsLoading(true);
     
@@ -157,17 +150,7 @@ const DraftTable = ({   showPagination,pagename }: Props) => {
       });
   };
   
-    // const getDrafts = async (page: any | undefined) => {
-    //   try {
-    //     setIsLoading(true);
-    //     const result = await fetchDraftsData({limit:20, step:page, pagename:pagename});
-    //     if(result && result.data)
-    //     setData(result.data);
-    //     setCount(result.count ?? 0);
-    //   } finally {
-    //     setIsLoading(false);
-    //   }
-    // }
+ 
 
   const rows =data &&  data.map(
     (
@@ -263,7 +246,7 @@ const DraftTable = ({   showPagination,pagename }: Props) => {
           >
             <div>
               <Button
-               onClick={() => handleDiscardJob(job.id)}
+               onClick={() => handleDiscardJob(job.id,job?.employer_logo)}
                 size="xs"
                 style={{
                   backgroundColor: "#DDF0FD",
@@ -340,7 +323,7 @@ const DraftTable = ({   showPagination,pagename }: Props) => {
                 color: '#718096',
                 fontSize: '16px'
               }}>
-                No jobs found. Start by posting your first job.
+                No drafts found.
               </div>
             ) : 
            (
