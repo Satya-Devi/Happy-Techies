@@ -1042,15 +1042,15 @@ const JobPreview = ({ job, jobs }: { job: any; jobs: any[] }) => {
   return (
     <div
       style={{
-        marginTop: "-95px",
+        marginTop: "-50px",
       }}
     >
       <Container size="xl">
         <main>
-          <Grid>
+          <Grid mx="auto" p="lg" style={{ maxWidth: "99%" }}>
             <GridCol span={{ base: 12, md: 8 }}>
               <Container>
-                <BackButton BackButtonStyles={{ marginLeft: "-10px" }} />
+                {/* <BackButton BackButtonStyles={{ marginLeft: "-10px" }} /> */}
                 <Group justify="space-between">
                   <Title
                     ta="left"
@@ -1336,7 +1336,7 @@ const JobPreview = ({ job, jobs }: { job: any; jobs: any[] }) => {
                     className={SFProRounded.className}
                   >
                     {job.employment_type
-                      ? `${capitalize(job.employment_type.toLowerCase())}` 
+                      ? `${capitalize(job.employment_type.toLowerCase())}`
                       : "Full-time role"}
                   </Text>
                 </CardSection>
@@ -1627,7 +1627,7 @@ const JobPreview = ({ job, jobs }: { job: any; jobs: any[] }) => {
                         whiteSpace: "nowrap",
                       }}
                     >
-                      ${job.salary_min || "NA"}  -  ${job.salary_max || "NA"}
+                      ${job.salary_min || "NA"} - ${job.salary_max || "NA"}
                     </Text>
                   </div>
                 </CardSection>

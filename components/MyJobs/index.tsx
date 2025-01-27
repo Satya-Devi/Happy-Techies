@@ -110,7 +110,7 @@ const MyJobs = ({ showPagination, pagename }: Props) => {
   const [count, setCount] = useState(0);
 
   useEffect(() => {
-    console.log("oooooo",pagename)
+    console.log("oooooo", pagename);
     getData(activePage);
   }, [activePage]);
   const handleMarkInactive = (jobId: any) => {
@@ -141,16 +141,37 @@ const MyJobs = ({ showPagination, pagename }: Props) => {
   //     console.error("Error marking job as inactive:", error);
   //   }
   // };
-  const deleteInactiveJob = (jobId:any) => {
-    deleteJob(jobId)
-      .then(() => {
-        // Refresh the jobs data
-        getData(activePage);
-      })
-      .catch((error) => {
-        console.error("Error marking job as inactive:", error);
-      });
+  const [seletedJobId, setSelectedJobId] = useState<string | null>(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+
+  const deleteInactiveJob = (jobId: any) => {
+    setSelectedJobId(jobId);
+    setShowDeleteModal(true);
   };
+
+  const handleConfirmDelete = () => {
+    if (seletedJobId) {
+      deleteJob(seletedJobId)
+        .then(() => {
+          getData(activePage);
+          setShowDeleteModal(false);
+        })
+        .catch((error) => {
+          console.error("Error marking job as inactive:", error);
+        });
+    }
+  };
+
+  // const deleteInactiveJob = (jobId: any) => {
+  //   deleteJob(jobId)
+  //     .then(() => {
+  //       // Refresh the jobs data
+  //       getData(activePage);
+  //     })
+  //     .catch((error) => {
+  //       console.error("Error marking job as inactive:", error);
+  //     });
+  // };
   // const getData = async (page: any | undefined) => {
   //   try {
   //     setIsLoading(true);
@@ -172,18 +193,17 @@ const MyJobs = ({ showPagination, pagename }: Props) => {
       step: page,
       pagename: pagename,
     })
-      .then(result => {
+      .then((result) => {
         if (result && result.data) setData(result.data);
         setCount(result.count ?? 0);
       })
-      .catch(error => {
+      .catch((error) => {
         console.error(error); // Handle any errors here if necessary
       })
       .finally(() => {
         setIsLoading(false);
       });
   };
-  
 
   const rows =
     data &&
@@ -197,7 +217,8 @@ const MyJobs = ({ showPagination, pagename }: Props) => {
             fontSize: "16px",
           }}
         >
-          {index + 1}
+          {/* {index + 1} */}
+          {((activePage - 1) * data.length) + (index + 1)}
         </Table.Td>
         <Table.Td>
           <div
@@ -508,8 +529,7 @@ const MyJobs = ({ showPagination, pagename }: Props) => {
   return (
     <Box mx="auto" p="lg" style={{ maxWidth: "89%" }}>
       <div className="scrollbar_hidden">
-        {isLoading ? 
-        (
+        {isLoading ? (
           <div
             style={{
               display: "flex",
@@ -575,6 +595,23 @@ const MyJobs = ({ showPagination, pagename }: Props) => {
           </Table>
         )}
       </div>
+      <Modal
+        opened={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        title="Confirm Deletion"
+        centered
+      >
+        <Text size="sm">Are you sure you want to delete this job?</Text>
+        <Group mt="md" justify="flex-end">
+          <Button variant="outline" onClick={() => setShowDeleteModal(false)}>
+            Cancel
+          </Button>
+          <Button color="#004A93" onClick={handleConfirmDelete}>
+            Delete
+          </Button>
+        </Group>
+      </Modal>
+
       {showPagination && count && (
         <div
           style={{

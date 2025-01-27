@@ -774,7 +774,7 @@ const EmpJobForm = ({ searchParams, onSubmit, data }: Props) => {
   
             let uploadPromise = Promise.resolve();
   
-            if (!is_draft && imageFile) {
+            if (imageFile) {
               uploadPromise = handleImageUpload(imageFile).then((url) => {
                 data.imageUrl = typeof url === "string" ? url : "";
               });
@@ -947,6 +947,17 @@ const showPaymentpage=()=>{
     ) : null;
   };
 
+  const [previewUrl, setPreviewUrl] = useState<string | null>(data?.[0]?.employer_logo || null);
+
+useEffect(() => {
+  // Cleanup function for object URLs
+  return () => {
+    if (previewUrl && previewUrl.startsWith('blob:')) {
+      URL.revokeObjectURL(previewUrl);
+    }
+  };
+}, [previewUrl]);
+
   return showPayment ? (
     <div>
       {/* <PaymentForm setShowPayment={setShowPayment} handleSubmit={handleSubmit} /> */}
@@ -1050,26 +1061,40 @@ const showPaymentpage=()=>{
                   size="md"
                   label="Company Logo"
                   clearable={false}
-                  valueComponent={(props) => {
-                    const { value } = props;
-
-                    if (value instanceof File) {
-                      return <ImagePreviewWrapper file={value} />;
-                    } else if (typeof value === "string") {
-                      return (
+                  valueComponent={() => {
+                    const displayUrl = previewUrl || formData.imageUrl;
+                    return displayUrl ? (
+                      <div style={{
+                        width: "100%",
+                        height: "120px",
+                        pointerEvents: "none",
+                        position: "relative",
+                      }}>
                         <img
-                          src={value}
-                          alt="Company Logo"
+                          src={displayUrl}
+                          alt="Preview"
                           style={{
                             width: "100%",
                             height: "100%",
-                            objectFit: "cover",
+                            objectFit: "contain",
                             borderRadius: "9.1px",
                           }}
                         />
-                      );
-                    } else {
-                      return null;
+                      </div>
+                    ) : null;
+                  }}
+                  accept="image/*"
+                  value={formData.imageUrl}
+                  onChange={(file) => {
+                    if (file) {
+                      if (file instanceof File) {
+                        const newUrl = URL.createObjectURL(file);
+                        setPreviewUrl(newUrl);
+                        handleInputChange("imageUrl", file);
+                      } else {
+                        setPreviewUrl(file);
+                        handleInputChange("imageUrl", file);
+                      }
                     }
                   }}
                   placeholder={
@@ -1098,7 +1123,6 @@ const showPaymentpage=()=>{
                       </div>
                     </div>
                   }
-                  accept="image/*"
                   styles={{
                     input: {
                       borderRadius: "9.1px",
@@ -1115,8 +1139,6 @@ const showPaymentpage=()=>{
                       paddingBottom: "10px",
                     },
                   }}
-                  value={formData.imageUrl}
-                  onChange={(file) => handleInputChange("imageUrl", file)}
                 />
                 {errors.imageUrl ? (
                   <div style={{ color: "red" }}>{errors.imageUrl}</div>
