@@ -447,6 +447,7 @@ const EmpJobForm = ({ searchParams, onSubmit, data }: Props) => {
   const [warningModal, setWarningModal] = useState(false);
   const [imageFile, setImageFile] = useState<string | null>(null);
   const [showPayment, setShowPayment] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   //const acceptedFormats = "Only .jpg, .jpeg, .png .webp, .avif formats allowed";
   const acceptedFormats =
@@ -754,6 +755,7 @@ const EmpJobForm = ({ searchParams, onSubmit, data }: Props) => {
   
   
   const handleSubmit = ({ is_draft, action }: { is_draft?: boolean; action?: string }): Promise<void> => {
+    setIsSubmitting(true);
     return new Promise((resolve, reject) => {
       console.log("submit$$$$$$$---", formData, is_draft);
       let isValidPromise;
@@ -800,6 +802,7 @@ const EmpJobForm = ({ searchParams, onSubmit, data }: Props) => {
                 else {
                   console.log("sasat1")
                   setShowPayment(true);
+                  setIsSubmitting(false);
                   reject("Failed to submit job.");
                 }
               } else {
@@ -845,9 +848,13 @@ const EmpJobForm = ({ searchParams, onSubmit, data }: Props) => {
                 setModalTitle("Fail!");
                 setModalText("Something went wrong!");
                 reject(error);
-              });
+              })
+              .finally(() => {
+                setIsSubmitting(false);
+              });;
           } else {
             console.log("Form has errors:", errors);
+            setIsSubmitting(false);
             reject("Form validation failed.");
           }
         });
@@ -1706,35 +1713,48 @@ useEffect(() => {
           Save Draft
         </Button>
         <Button
-          type="submit"
-          size="md"
-          style={{
-            backgroundColor: "#004A93", // Correct property name
-            color: "white",
-          }}
-          onClick={() => handleSubmit({})}
-          // onClick={handleSubmit}
-        >
-          Make Payment
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            width="16"
-            height="16"
-            fill="none"
-            stroke="#ffffff"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            style={{
-              marginLeft: "6px",
-            }}
-          >
-            <circle cx="12" cy="12" r="10" />
-            <line x1="8" y1="12" x2="16" y2="12" />
-            <polyline points="12 8 16 12 12 16" />
-          </svg>
-        </Button>
+  type="submit"
+  size="md"
+  loading={isSubmitting}
+  disabled={isSubmitting}
+  style={{
+    backgroundColor: "#004A93",
+    color: "white",
+    minWidth: "140px",
+    transition: "all 0.3s ease",
+  }}
+  onClick={() => handleSubmit({})}
+>
+  {isSubmitting ? (
+    "Processing..."
+  ) : (
+    <>
+      Make Payment
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        width="16"
+        height="16"
+        fill="none"
+        stroke="#ffffff"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        style={{
+          marginLeft: "6px",
+          opacity: isSubmitting ? 0 : 1,
+          transition: "opacity 0.2s",
+        }}
+      >
+        <circle cx="12" cy="12" r="10" />
+        <line x1="8" y1="12" x2="16" y2="12" />
+        <polyline points="12 8 16 12 12 16" />
+      </svg>
+    </>
+  )}
+</Button>
+
+    
         <Modal
           opened={isModalOpen}
           onClose={() => setModalOpen(false)}

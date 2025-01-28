@@ -223,6 +223,7 @@ const EditJobForm = ({ searchParams, actions, onSubmit, data }: Props) => {
     isDraft: false,
   });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isModalOpen, setModalOpen] = useState(false);
   const [isModalClose, setModalClose] = useState(false);
   // const [isSubmit, setIsSubmit] = useState(false);
@@ -345,7 +346,10 @@ const EditJobForm = ({ searchParams, actions, onSubmit, data }: Props) => {
   //       console.error("Validation error:", validationError);
   //     });
   // };
+
   const handleSubmit = () => {
+    setIsSubmitting(true);
+
     validateForm()
       .then((isValid) => {
         console.log("Validation result:", isValid);
@@ -374,15 +378,20 @@ const EditJobForm = ({ searchParams, actions, onSubmit, data }: Props) => {
               setModalOpen(true);
               setModalTitle("Fail!");
               setModalText("Something went wrong!");
+            })
+            .finally(() => {
+              setIsSubmitting(false);
             });
 
           console.log("Form submitted successfully:", data);
         } else {
           console.log("Form has errors:", errors);
+          setIsSubmitting(false);
         }
       })
       .catch((validationError) => {
         console.error("Validation failed:", validationError);
+        setIsSubmitting(false);
       });
   };
 
@@ -1053,17 +1062,29 @@ const EditJobForm = ({ searchParams, actions, onSubmit, data }: Props) => {
             gap: "16px",
           }}
         >
-          <Button
-            type="submit"
-            size="md"
-            style={{
-              backgroundColor: "#004A93",
-              color: "white",
-            }}
-            onClick={handleSubmit}
-          >
-            Update Job
-          </Button>
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <Button
+              type="submit"
+              size="md"
+              loading={isSubmitting}
+              disabled={isSubmitting}
+              style={{
+                backgroundColor: "#004A93",
+                color: "white",
+                minWidth: "120px",
+                transition: "all 0.3s ease",
+                fontWeight: 600,
+                "&:hover": {
+                  backgroundColor: "#003972",
+                  transform: "translateY(-1px)",
+                },
+              }}
+              onClick={handleSubmit}
+            >
+              {isSubmitting ? "Updating..." : "Update"}
+            </Button>
+          </div>
+
           <Modal
             opened={isModalOpen}
             onClose={() => setModalOpen(false)}
@@ -1088,16 +1109,16 @@ const EditJobForm = ({ searchParams, actions, onSubmit, data }: Props) => {
                   : "The form has been updated successfully!"}
               </Text>
               <Group justify="flex-end">
-              <Button
-                style={buttonStyle}
-                onClick={() => {
-                  setModalOpen(false);
-                  setModalClose(true);
-                }}
-                mt="md"
-              >
-                Close
-              </Button>
+                <Button
+                  style={buttonStyle}
+                  onClick={() => {
+                    setModalOpen(false);
+                    setModalClose(true);
+                  }}
+                  mt="md"
+                >
+                  Close
+                </Button>
               </Group>
             </Box>
           </Modal>

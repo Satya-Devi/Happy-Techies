@@ -82,6 +82,8 @@ export default async function Page({ params }: { params: { id: string } }) {
     else jobIsSaved = savedJob !== null;
   }
 
+  console.log("checking job", job);
+
   const SaveButton = () => {
     if (!user) {
       return (
@@ -163,12 +165,9 @@ export default async function Page({ params }: { params: { id: string } }) {
 
   return (
     <>
-    <head>
+      <head>
         <title>{job.job_title}</title>
-        <meta
-          name="description"
-          content={job.job_description}
-        />
+        <meta name="description" content={job.job_description} />
       </head>
       <ContainedNav />
       <Container size="xl">
@@ -210,7 +209,7 @@ export default async function Page({ params }: { params: { id: string } }) {
                       // lineHeight: "73.2px",
                       textAlign: "left",
                       color: "#004A93",
-                      wordBreak:"break-all"
+                      wordBreak: "break-all",
                     }}
                   >
                     {job.job_title}
@@ -451,7 +450,7 @@ export default async function Page({ params }: { params: { id: string } }) {
                     size="lg"
                     fz={"md"}
                     color="#004a93"
-                    href={job.job_listing_source_url?.toString()}
+                    href={job.employer_id ? `/apply-form?job_id=${job.id}` : "/login"}
                     target="_blank"
                     rel="noopener noreferrer"
                     leftSection={
@@ -667,7 +666,7 @@ export default async function Page({ params }: { params: { id: string } }) {
                     }}
                   >
                     {job.salary_range
-                      ? job.salary_range.replace(/\b(\d+)\b/g, (match:any) =>
+                      ? job.salary_range.replace(/\b(\d+)\b/g, (match: any) =>
                           parseInt(match, 10).toLocaleString()
                         )
                       : "No salary information was found."}

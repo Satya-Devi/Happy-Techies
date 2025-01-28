@@ -4,7 +4,6 @@ import { createClient } from "@/utils/supabase/server";
 import Dashboard from "@/components/Dashboard/Dashboard";
 import Draft from "@/components/DraftSection/Draft";
 
-
 export default async function Overview() {
   const supabase = createClient();
   const data = await supabase.auth.getUser();
@@ -26,16 +25,16 @@ export default async function Overview() {
     redirect("/employers-login");
   }
   let query = supabase
-  .from("jobs")
-  .select("*", { count: "exact" })
-  .eq("employer_id", data?.data?.user?.id)
-  .neq("is_draft", true)
-  .or("is_archived.is.null,is_archived.neq.true")
-  .or("job_status.is.null,job_status.eq.active");
+    .from("jobs")
+    .select("*", { count: "exact" })
+    .eq("employer_id", data?.data?.user?.id)
+    .neq("is_draft", true)
+    .or("is_archived.is.null,is_archived.neq.true")
+    .or("job_status.is.null,job_status.eq.active");
 
-
-const { data: countData, count, error: countErr } = await query;
-  if(countErr) {
+  const { data: countData, count, error: countErr } = await query;
+  console.log("checking count", countData);
+  if (countErr) {
     console.error("Error fetching count:", countErr);
     return { error: countErr };
   }
@@ -51,10 +50,9 @@ const { data: countData, count, error: countErr } = await query;
         isHome
       />
       <div>
-      
-     <Dashboard count={count}/> 
-      <Draft />
-    </div>
+        <Dashboard count={count} />
+        <Draft />
+      </div>
     </>
   );
 }
