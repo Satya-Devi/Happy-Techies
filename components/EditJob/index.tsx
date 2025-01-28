@@ -223,6 +223,7 @@ const EditJobForm = ({ searchParams, actions, onSubmit, data }: Props) => {
     isDraft: false,
   });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isModalOpen, setModalOpen] = useState(false);
   const [isModalClose, setModalClose] = useState(false);
   // const [isSubmit, setIsSubmit] = useState(false);
@@ -239,12 +240,14 @@ const EditJobForm = ({ searchParams, actions, onSubmit, data }: Props) => {
   console.log("Modal45678", data, formData);
   const validateField = (fieldName: string, value: any) => {
     console.log("Validation", value);
-    
-    const validationData = fieldName === "salaryMax" 
-      ? { [fieldName]: value, salaryMin: formData.salaryMin } 
-      : { [fieldName]: value };
-    
-    validationSchema.validateAt(fieldName, validationData)
+
+    const validationData =
+      fieldName === "salaryMax"
+        ? { [fieldName]: value, salaryMin: formData.salaryMin }
+        : { [fieldName]: value };
+
+    validationSchema
+      .validateAt(fieldName, validationData)
       .then(() => {
         setErrors((prev) => {
           const { [fieldName]: _, ...rest } = prev; // Remove the field from the errors object
@@ -259,10 +262,10 @@ const EditJobForm = ({ searchParams, actions, onSubmit, data }: Props) => {
   };
   const handleInputChange = (key: string, value: any) => {
     setFormData((prev) => ({ ...prev, [key]: value }));
-    
+
     validateField(key, value);
   };
-  
+
   // const validateForm = async (): Promise<boolean> => {
   //   try {
   //     // Filter out fields with no data before validation
@@ -310,7 +313,7 @@ const EditJobForm = ({ searchParams, actions, onSubmit, data }: Props) => {
   //       console.log("Success!!!!!!!!!!!!!1111", isValid);
   //       if (isValid || Object.keys(errors).length === 0) {
   //         let data = formData;
-  
+
   //         editJob(data,formData.id)
   //           .then((res : any) => {
   //             console.log("Success!!!!!!!!!!!!!", res);
@@ -343,14 +346,17 @@ const EditJobForm = ({ searchParams, actions, onSubmit, data }: Props) => {
   //       console.error("Validation error:", validationError);
   //     });
   // };
+
   const handleSubmit = () => {
+    setIsSubmitting(true);
+
     validateForm()
       .then((isValid) => {
         console.log("Validation result:", isValid);
-        
+
         if (isValid || Object.keys(errors).length === 0) {
           let data = formData;
-  
+
           editJob(data, formData.id)
             .then((res) => {
               console.log("Success response:", res);
@@ -372,19 +378,23 @@ const EditJobForm = ({ searchParams, actions, onSubmit, data }: Props) => {
               setModalOpen(true);
               setModalTitle("Fail!");
               setModalText("Something went wrong!");
+            })
+            .finally(() => {
+              setIsSubmitting(false);
             });
-  
+
           console.log("Form submitted successfully:", data);
         } else {
           console.log("Form has errors:", errors);
+          setIsSubmitting(false);
         }
       })
       .catch((validationError) => {
         console.error("Validation failed:", validationError);
+        setIsSubmitting(false);
       });
   };
-  
-  
+
   let formattedDeadline = null;
   if (data[0]?.application_deadline) {
     formattedDeadline = new Date(data[0]?.application_deadline)
@@ -410,7 +420,6 @@ const EditJobForm = ({ searchParams, actions, onSubmit, data }: Props) => {
   }
   return (
     <div>
-    
       <Box
         mx="auto"
         p="lg"
@@ -423,16 +432,16 @@ const EditJobForm = ({ searchParams, actions, onSubmit, data }: Props) => {
         }}
       >
         <div
-        onClick={() => setAction("")}
+          onClick={() => setAction("")}
           style={{
             color: "grey",
-             display: "flex",
-             padding: "10px",
-             width: "100%",
+            display: "flex",
+            padding: "10px",
+            width: "100%",
             justifyContent: "right",
           }}
         >
-        <IconEdit stroke={2} /> Edit
+          <IconEdit stroke={2} /> Edit
         </div>
         <div className={classes.header}>
           <div style={{ display: "flex", gap: "20px", alignItems: "center" }}>
@@ -520,7 +529,7 @@ const EditJobForm = ({ searchParams, actions, onSubmit, data }: Props) => {
             </Group>
           </div>
         </div>
-      
+
         <form>
           <Grid
             gutter={34}
@@ -1053,24 +1062,36 @@ const EditJobForm = ({ searchParams, actions, onSubmit, data }: Props) => {
             gap: "16px",
           }}
         >
-          <Button
-            type="submit"
-            size="md"
-            style={{
-              backgroundColor: "#004A93",
-              color: "white",
-            }}
-            onClick={handleSubmit}
-          >
-            Update Job
-          </Button>
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <Button
+              type="submit"
+              size="md"
+              loading={isSubmitting}
+              disabled={isSubmitting}
+              style={{
+                backgroundColor: "#004A93",
+                color: "white",
+                minWidth: "120px",
+                transition: "all 0.3s ease",
+                fontWeight: 600,
+                "&:hover": {
+                  backgroundColor: "#003972",
+                  transform: "translateY(-1px)",
+                },
+              }}
+              onClick={handleSubmit}
+            >
+              {isSubmitting ? "Updating..." : "Update"}
+            </Button>
+          </div>
+
           <Modal
             opened={isModalOpen}
             onClose={() => setModalOpen(false)}
             centered
             size="lg"
           >
-            <Box ml={40} mr={40} mb={40}>
+            <Box ml={10} mr={10} mb={10}>
               <Title
                 ta="left"
                 order={1}
@@ -1087,16 +1108,18 @@ const EditJobForm = ({ searchParams, actions, onSubmit, data }: Props) => {
                   ? ModalText
                   : "The form has been updated successfully!"}
               </Text>
-              <Button
-                style={buttonStyle}
-                onClick={() => {
-                  setModalOpen(false);
-                  setModalClose(true);
-                }}
-                mt="md"
-              >
-                Close
-              </Button>
+              <Group justify="flex-end">
+                <Button
+                  style={buttonStyle}
+                  onClick={() => {
+                    setModalOpen(false);
+                    setModalClose(true);
+                  }}
+                  mt="md"
+                >
+                  Close
+                </Button>
+              </Group>
             </Box>
           </Modal>
         </Group>

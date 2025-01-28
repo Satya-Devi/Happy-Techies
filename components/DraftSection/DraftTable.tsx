@@ -1,8 +1,8 @@
 "use client";
 import { useState, useEffect } from "react";
-import { fetchDraftsData , deleteDraft} from "@/app/my-drafts/action";
+import { fetchDraftsData, deleteDraft } from "@/app/my-drafts/action";
 import { SFProRounded } from "@/app/layout";
-import Loading from '@/app/loading'
+import Loading from "@/app/loading";
 import {
   Button,
   TextInput,
@@ -92,14 +92,15 @@ interface JobRowData {
   title?: string;
 }
 
-const DraftTable = ({   showPagination,pagename }: Props) => {
-
+const DraftTable = ({ showPagination, pagename }: Props) => {
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
   const [activePage, setActivePage] = useState(1);
   const [data, setData] = useState<JobRowData[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedDraftId, setSelectedDraftId] = useState<string | null | undefined>(null);
+  const [selectedDraftId, setSelectedDraftId] = useState<
+    string | null | undefined
+  >(null);
   const [imageId, setimageId] = useState<string | null | undefined>(null);
 
   // const [data, setData] = useState([]);
@@ -107,17 +108,20 @@ const DraftTable = ({   showPagination,pagename }: Props) => {
 
   useEffect(() => {
     getDrafts(activePage);
-  },[activePage]);
-  const handleDiscardJob = (draftId: string | undefined,imageId: string | undefined | null) => {
+  }, [activePage]);
+  const handleDiscardJob = (
+    draftId: string | undefined,
+    imageId: string | undefined | null
+  ) => {
     setimageId(imageId);
     setSelectedDraftId(draftId);
-     setIsModalOpen(true);
-  }
+    setIsModalOpen(true);
+  };
   const handleDiscardDraft = () => {
     setIsModalOpen(false); // Close the modal after discarding the draft
     setIsLoading(true);
-  
-    deleteDraft(selectedDraftId,imageId)
+
+    deleteDraft(selectedDraftId, imageId)
       .then(() => {
         // Refresh the drafts list
         return getDrafts(activePage); // Assuming you have a function to fetch drafts
@@ -125,49 +129,44 @@ const DraftTable = ({   showPagination,pagename }: Props) => {
       .then(() => {
         setIsLoading(false);
       })
-      .catch(error => {
-        console.error('Error discarding draft:', error);
+      .catch((error) => {
+        console.error("Error discarding draft:", error);
         setIsLoading(false);
       });
   };
-  
- 
+
   const getDrafts = (page: any | undefined) => {
     setIsLoading(true);
-    
+
     fetchDraftsData({ limit: 20, step: page, pagename: pagename })
-      .then(result => {
+      .then((result) => {
         if (result && result.data) {
           setData(result.data);
         }
         setCount(result.count ?? 0);
       })
-      .catch(error => {
-        console.error('Error fetching drafts:', error);
+      .catch((error) => {
+        console.error("Error fetching drafts:", error);
       })
       .finally(() => {
         setIsLoading(false);
       });
   };
-  
- 
 
-  const rows =data &&  data.map(
-    (
-      job: JobRowData,
-      index: number 
-    ) => 
-(
+  const rows =
+    data &&
+    data.map((job: JobRowData, index: number) => (
       <Table.Tr key={index}>
         <Table.Td
           style={{
-            textAlign: "center", 
+            textAlign: "center",
             color: "#718096",
             fontWeight: 500,
             fontSize: "16px",
           }}
         >
-          {index + 1}
+          {/* {index + 1} */}
+          {(activePage - 1) * data.length + (index + 1)}
         </Table.Td>
         <Table.Td>
           <div
@@ -182,17 +181,17 @@ const DraftTable = ({   showPagination,pagename }: Props) => {
               style={{ fontWeight: "bold", fontSize: "16px", color: "#333" }}
             >
               {job.job_title &&
-              job.job_title
-                .split(" ")
-                .map((word) => {
-                  if (word.startsWith("(") && word.endsWith(")")) {
-                    return word.toUpperCase();
-                  }
-                  return (
-                    word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-                  );
-                })
-                .join(" ")}
+                job.job_title
+                  .split(" ")
+                  .map((word) => {
+                    if (word.startsWith("(") && word.endsWith(")")) {
+                      return word.toUpperCase();
+                    }
+                    return (
+                      word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+                    );
+                  })
+                  .join(" ")}
             </div>
             <div
               style={{
@@ -212,9 +211,7 @@ const DraftTable = ({   showPagination,pagename }: Props) => {
                   }}
                 ></div>
               )}
-              <div>
-                {job.job_location}
-              </div>
+              <div>{job.job_location}</div>
             </div>
           </div>
         </Table.Td>
@@ -246,7 +243,7 @@ const DraftTable = ({   showPagination,pagename }: Props) => {
           >
             <div>
               <Button
-               onClick={() => handleDiscardJob(job.id,job?.employer_logo)}
+                onClick={() => handleDiscardJob(job.id, job?.employer_logo)}
                 size="xs"
                 style={{
                   backgroundColor: "#DDF0FD",
@@ -260,7 +257,9 @@ const DraftTable = ({   showPagination,pagename }: Props) => {
             </div>
             <div>
               <Button
-              onClick={() => {router.push(`/post-job?id=${job.id}`);}}
+                onClick={() => {
+                  router.push(`/post-job?id=${job.id}`);
+                }}
                 size="xs"
                 style={{
                   backgroundColor: "#DDF0FD",
@@ -274,7 +273,9 @@ const DraftTable = ({   showPagination,pagename }: Props) => {
             </div>
             <div>
               <Button
-              onClick={() => {router.push(`/post-job?id=${job.id}&action=payment`);}}
+                onClick={() => {
+                  router.push(`/post-job?id=${job.id}&action=payment`);
+                }}
                 size="xs"
                 style={{
                   backgroundColor: "#DDF0FD",
@@ -289,133 +290,141 @@ const DraftTable = ({   showPagination,pagename }: Props) => {
           </div>
         </Table.Td>
       </Table.Tr>
-    )  );
+    ));
   return (
     <Box mx="auto" p="lg" style={{ maxWidth: "89%" }}>
-      
       <div
-      className='jobs-table'
+        className="jobs-table"
         style={{
           overflowX: "auto",
           msOverflowStyle: "none" /* IE and Edge */,
           scrollbarWidth: "none" /* Firefox */,
-          
         }}
       >
-         {isLoading ? (
-           
-        <div style={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          minHeight: '50vh', // This ensures vertical centering
-          width: '100%'
-        }}>
-          <Loading />
-        </div>
-        // In the render section:
-        //  <Loading />  // rest of the code
-        
-            ) : data.length === 0 ? (
-              <div style={{
-                textAlign: 'center',
-                padding: '40px',
-                color: '#718096',
-                fontSize: '16px'
-              }}>
-                No drafts found.
-              </div>
-            ) : 
-           (
-        <Table verticalSpacing="sm">
-          <Table.Thead
+        {isLoading ? (
+          <div
             style={{
-              backgroundColor: "#DDF0FD",
-              color: "#004A93",
-              height: "30px",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              minHeight: "50vh", // This ensures vertical centering
+              width: "100%",
             }}
           >
-            <Table.Tr>
-              <Table.Th style={{ textAlign: "center", whiteSpace: "nowrap" }}>
-                #
-              </Table.Th>
-              <Table.Th style={{ textAlign: "center", whiteSpace: "nowrap" }}>
-                JOBS
-              </Table.Th>
-              <Table.Th style={{ textAlign: "center", whiteSpace: "nowrap" }}>
-                POSTING DATE
-              </Table.Th>
-              <Table.Th style={{ textAlign: "center", whiteSpace: "nowrap" }}>
-                ACTIONS
-              </Table.Th>
-            </Table.Tr>
-          </Table.Thead>
-          <Table.Tbody>{rows}</Table.Tbody>
-        </Table>
+            <Loading />
+          </div>
+        ) : // In the render section:
+        //  <Loading />  // rest of the code
+
+        data.length === 0 ? (
+          <div
+            style={{
+              textAlign: "center",
+              padding: "40px",
+              color: "#718096",
+              fontSize: "16px",
+            }}
+          >
+            No drafts found.
+          </div>
+        ) : (
+          <Table verticalSpacing="sm">
+            <Table.Thead
+              style={{
+                backgroundColor: "#DDF0FD",
+                color: "#004A93",
+                height: "30px",
+              }}
+            >
+              <Table.Tr>
+                <Table.Th style={{ textAlign: "center", whiteSpace: "nowrap" }}>
+                  #
+                </Table.Th>
+                <Table.Th style={{ textAlign: "center", whiteSpace: "nowrap" }}>
+                  JOBS
+                </Table.Th>
+                <Table.Th style={{ textAlign: "center", whiteSpace: "nowrap" }}>
+                  POSTING DATE
+                </Table.Th>
+                <Table.Th style={{ textAlign: "center", whiteSpace: "nowrap" }}>
+                  ACTIONS
+                </Table.Th>
+              </Table.Tr>
+            </Table.Thead>
+            <Table.Tbody>{rows}</Table.Tbody>
+          </Table>
         )}
       </div>
-      {showPagination && count &&(
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginTop: "30px",
-        }}
-      >
-       
+      {showPagination && count && (
         <div
           style={{
-            fontSize: "18px",
-            fontWeight: 500,
-            color: "#000",
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginTop: "30px",
           }}
         >
-          Total {count || 0} Jobs
-        </div>
-        
-        <div style={{
-          display: "flex",
-          justifyContent: "center",
-          marginTop: "30px",
-        }}>
-          <Pagination
-            total={Math.ceil((count || 0) / 20)}
-            value={activePage}
-            onChange={(page) => {
-              setActivePage(page);
-              // router.push(`/post-job?page=${page}`);
+          <div
+            style={{
+              fontSize: "18px",
+              fontWeight: 500,
+              color: "#000",
             }}
-            boundaries={1}
-          />
+          >
+            Total {count || 0} Jobs
+          </div>
+
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              marginTop: "30px",
+            }}
+          >
+            <Pagination
+              total={Math.ceil((count || 0) / 20)}
+              value={activePage}
+              onChange={(page) => {
+                setActivePage(page);
+                // router.push(`/post-job?page=${page}`);
+              }}
+              boundaries={1}
+            />
+          </div>
+          {/* <Pagination total={1} boundaries={1} defaultValue={1} /> */}
         </div>
-        {/* <Pagination total={1} boundaries={1} defaultValue={1} /> */}
-      </div>)}
+      )}
       <Modal
-              opened={isModalOpen}
-              onClose={() => setIsModalOpen(false)}
-              centered
-              size="lg"
-            >
-              <Box ml={40} mr={40} mb={40}>
-                <Text className={SFProRounded.className} c="dark" size="md">
-                  {/* {searchParams?.message && searchParams.message == "Fail"?"Somthing went wrong Please try again!": ModalText?.length?ModalText:"The form has been submitted successfully!"} */}
-                  This action will permanently delete your draft. Are you sure you want to continue?
-                </Text>
-                <Button
-                  style={buttonStyle}
-                  onClick={() => {
-                    handleDiscardDraft();
-                  }}
-                  mt="md"
-                >
-                  Yes
-                </Button>
-              </Box>
-            </Modal>
+        opened={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        centered
+        size="lg"
+      >
+        <Text size="md" style={{
+          marginBottom: "25px",
+        }} className={SFProRounded.className}>
+          This action will permanently delete your draft. Are you sure you want
+          to continue ?
+        </Text>
+        <Group mt="md" justify="flex-end">
+          <Button
+            variant="outline"
+            aria-label="Cancel"
+            onClick={() => setIsModalOpen(false)}
+          >
+            Cancel
+          </Button>
+          <Button
+            color="#004A93"
+            aria-label="Delete draft"
+            onClick={handleDiscardDraft}
+          >
+            Delete
+          </Button>
+        </Group>
+      </Modal>
     </Box>
-    
   );
 };
 
