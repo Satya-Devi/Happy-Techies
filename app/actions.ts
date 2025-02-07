@@ -215,6 +215,9 @@ export async function getRecommendedJobs(
       let descQuery = supabase
         .from("jobs")
         .select("*")
+        .neq("is_draft", true)
+        .or("is_archived.is.null,is_archived.neq.true")
+        .or("job_status.is.null,job_status.eq.active")
         .textSearch("company_description", skillsQuery, {
           type: "websearch",
           config: "english",
@@ -244,6 +247,9 @@ export async function getRecommendedJobs(
     const { data: fallbackRecs, error: fallbackError } = await supabase
       .from("jobs")
       .select("*")
+      .neq("is_draft", true)
+      .or("is_archived.is.null,is_archived.neq.true")
+      .or("job_status.is.null,job_status.eq.active")
       .textSearch("company_description", "microsoft")
       .limit(3);
 
@@ -323,6 +329,9 @@ export const fetchJobsByKeywords = async () => {
     const { data, error } = await supabase
       .from("jobs")
       .select("*")
+      .neq("is_draft", true)
+      .or("is_archived.is.null,is_archived.neq.true")
+      .or("job_status.is.null,job_status.eq.active")
       .eq("solution_area", keywords[key])
       .not('created_at', 'is', null)
       .order("created_at", { ascending: false })

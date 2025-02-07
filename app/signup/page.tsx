@@ -89,6 +89,7 @@ export default function Signup({
     const user = data.user;
 
     if (error) {
+      console.log("emp error",error);
       return redirect("/login?message=Could not authenticate user");
     }
 

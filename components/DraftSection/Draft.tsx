@@ -25,7 +25,7 @@ export default async function Draft(
       console.error("Error fetching user:", empError);
       return;
     }
-    if (!(empData && empData.length > 0 && empData[0].is_employer_login)) {
+    if (!(empData && empData.length > 0)) {
       redirect("/employers-login");
     }
   } else {

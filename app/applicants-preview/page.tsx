@@ -26,7 +26,7 @@ export default async function ApplicantsPreviewPage({
       return;
     }
 
-    if (!(empData && empData.length > 0 && empData[0].is_employer_login)) {
+    if (!(empData && empData.length > 0 )) {
       redirect("/employers-login");
     }
   } else {

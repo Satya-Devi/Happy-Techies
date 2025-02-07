@@ -5,6 +5,7 @@
   export async function editJob(formData: any, id:any) {
     const userdata = await supabase.auth.getUser();
 //   const signUp = async (formData: any) => {
+
     console.log("formData=======????", formData);
     let formattedDate = null;
     if (formData?.deadline) {

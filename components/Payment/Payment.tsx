@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { SFProRounded } from "@/app/layout";
+import { insertPaymentData } from "@/app/payment/action";
 import {
   Button,
   TextInput,
@@ -30,95 +31,280 @@ import * as Yup from "yup";
 
 // Validation Schema using Yup
 const validationSchema = Yup.object().shape({
-  employersName: Yup.string().required("Employer's name is required"),
-  companyName: Yup.string().required("Company name is required"),
+  employerName: Yup.string().required("Employer's name is required")
+  .transform((value) => (value === "" ? null : value))
+    .test(
+      "no-spaces-only",
+      "Employer Name cannot contain only spaces",
+      (value) => {
+        if (!value) return true;
+        return value.trim().length > 0;
+      }
+    )
+    .min(2, "Employer Name must be at least 2 characters long")
+    .max(50, "Employer Name cannot exceed 50 characters")
+    .matches(
+      /^[a-zA-Z0-9]+(?:[-'\s][a-zA-Z0-9]+)*$/,
+      "Employer Name can only include letters, numbers, spaces, hyphens, and apostrophes"
+    ),
+  companyName: Yup.string().required("Company name is required")
+  .transform((value) => (value === "" ? null : value))
+    .test(
+      "no-spaces-only",
+      "Employer Name cannot contain only spaces",
+      (value) => {
+        if (!value) return true;
+        return value.trim().length > 0;
+      }
+    )
+    .min(2, "Company Name must be at least 2 characters long")
+    .max(50, "Company Name cannot exceed 50 characters")
+    .matches(
+      /^[a-zA-Z0-9]+(?:[-'\s][a-zA-Z0-9]+)*$/,
+      "Company Name can only include letters, numbers, spaces, hyphens, and apostrophes"
+    ),
   contactNumber: Yup.string()
-    .matches(/^\d{10,15}$/, "Contact number must be between 10-15 digits")
-    .required("Contact number is required"),
-  billingAddress: Yup.string().required("Billing address is required"),
-  cardholderName: Yup.string().required("Cardholder name is required"),
-  cardNumber: Yup.string()
-    .matches(/^\d{16}$/, "Card number must be 16 digits")
-    .required("Card number is required"),
-  expirationDate: Yup.date()
-    .required("Expiration date is required")
-    .min(new Date(), "Expiration date must be in the future"),
-  cvc: Yup.string()
-    .matches(/^\d{3}$/, "CVC must be 3 digits")
-    .required("CVC is required"),
+  // .matches(/^\+?[1-9]\d{1,14}$/, "Enter a valid phone number") // Validates phone number format
+  // .required("Contact number is required"),
+  .matches(/^(\+1\s?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}$/, "Invalid U.S. phone number")
+  .required("Phone number is required"),
+  billingAddress: Yup.string().required("Billing address is required")
+  .transform((value) => (value === "" ? null : value))
+    .test(
+      "no-spaces-only",
+      "Billing Address cannot contain only spaces",
+      (value) => {
+        if (!value) return true;
+        return value.trim().length > 0;
+      }
+    )
+    .min(5, "Billing Address must be at least 5 characters long"),
+  emailAddress: Yup.string()
+  .email("Please enter a valid email address") // Validates that the input is a proper email format
+  .required("Employer email is required"),
   country: Yup.string().required("Country is required"),
 });
+const instantValidationSchema = Yup.object().shape({
+  employerName: Yup.string()
+    .nullable()
+    .transform((value) => (value === "" ? null : value))
+    .test(
+      "no-spaces-only",
+      "Employer Name cannot contain only spaces",
+      (value) => {
+        if (!value) return true;
+        return value.trim().length > 0;
+      }
+    )
+    .min(2, "Employer Name must be at least 2 characters long")
+    .max(50, "Employer Name cannot exceed 50 characters")
+    .matches(
+      /^[a-zA-Z0-9]+(?:[-'\s][a-zA-Z0-9]+)*$/,
+      "Employer Name can only include letters, numbers, spaces, hyphens, and apostrophes"
+    ),
+    companyName: Yup.string()
+    .nullable()
+    .transform((value) => (value === "" ? null : value))
+    .test(
+      "no-spaces-only",
+      "Employer Name cannot contain only spaces",
+      (value) => {
+        if (!value) return true;
+        return value.trim().length > 0;
+      }
+    )
+    .min(2, "Company Name must be at least 2 characters long")
+    .max(50, "Company Name cannot exceed 50 characters")
+    .matches(
+      /^[a-zA-Z0-9]+(?:[-'\s][a-zA-Z0-9]+)*$/,
+      "Company Name can only include letters, numbers, spaces, hyphens, and apostrophes"
+    ),
+
+    contactNumber: Yup.string()
+    .nullable()
+    .transform((value) => (value === "" ? null : value))
+    // .matches(/^\+?[1-9]\d{1,14}$/, "Enter a valid phone number"), // Validates phone number format
+    .matches(/^(\+1\s?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}$/, "Invalid U.S. phone number"),
+    // .required("Phone number is required"),
+    billingAddress: Yup.string()
+    .nullable()
+    .transform((value) => (value === "" ? null : value))
+    .test(
+      "no-spaces-only",
+      "Billing Address cannot contain only spaces",
+      (value) => {
+        if (!value) return true;
+        return value.trim().length > 0;
+      }
+    )
+    .min(5, "Billing Address must be at least 5 characters long"),
+    emailAddress: Yup.string()
+    .nullable()
+    .email("Please enter a valid email address"), // Validates that the input is a proper email format
+  country: Yup.string().nullable(),
+  });
 interface PaymentFormProps {
   setShowPayments?: () => void;
   handleSubmit?: (data: any) => void;
   payment?: boolean;
+  jobId?: string;
 }
 const PaymentForm = ({ setShowPayments = () => {}, 
 handleSubmit = () => {} ,
-payment
+payment,
+jobId, 
 // setShowPayments, handleSubmit 
 }: PaymentFormProps) =>
   // { onSubmit }: { onSubmit: (data: any) => void }
   {
+    console.log("JOBBID", jobId);
     const searchParams = useSearchParams();
     const action = payment? "payment" : searchParams.get("action") ;
     const [formData, setFormData] = useState({
-      employersName: "",
+      employerName: "",
       companyName: "",
       contactNumber: "",
       billingAddress: "",
-      cardholderName: "",
-      cardNumber: "",
-      expirationDate: "",
-      cvc: "",
+      emailAddress: "",
       country: "",
     });
-
+    const [empId, setEmpId] =useState(null);
+    const [orderId, setOrderId] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
     const [warningModal, setWarningModal] = useState(false);
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
     const [modalMessage, setModalMessage] = useState("");
     const router = useRouter();
-    const handleInputChange = (key: string, value: any) => {
-      console.log("handle", key, value, formData);
-      setFormData((prev) => ({ ...prev, [key]: value }));
-    };
-    const handleContinue = () => {
-      handleSubmit({});
-      setWarningModal(true);
-    };
-    const validateForm = (): Promise<boolean> => {
-      return new Promise((resolve, reject) => {
-        // Filter out fields with no data before validation
-        const filteredFormData = Object.fromEntries(
-          Object.entries(formData).filter(
-            ([key, value]) => value !== null && value !== ""
-          )
-        );
-    
-        validationSchema
-          .validate(filteredFormData, {
-            abortEarly: false,
-          })
+    // const handleInputChange = (key: string, value: any) => {
+    //   console.log("handle", key, value, formData);
+    //   setFormData((prev) => ({ ...prev, [key]: value }));
+    // };
+
+     const validateForm = (): Promise<boolean> => {
+        return validationSchema.validate(formData, { abortEarly: false })
           .then(() => {
-            setErrors({}); // Clear any previous errors
-            resolve(true); // Resolve as valid
+            console.log("NOOOOOO ERRRRRORRRRS");
+            setErrors({});
+            return true;
           })
           .catch((validationErrors) => {
+            console.log("ERROR: " + validationErrors);
             if (validationErrors instanceof Yup.ValidationError) {
-              const formErrors: { [key: string]: string } = {};
+              const formErrors :{ [key: string]: string } = {};
               validationErrors.inner.forEach((error) => {
-                if (error.path) {
-                  formErrors[error.path] = error.message;
-                }
+                formErrors[error.path || ""] = error.message;
               });
-              setErrors(formErrors); // Set the errors
+              console.log("formErrorssss", formErrors);
+              setErrors(formErrors);
             }
-            reject(false); // Reject as invalid
+            return false;
           });
-      });
-    };
-    
+      };
+    const handleContinue = () => {
+      //handleSubmit({});
+     let isValidPromise = validateForm();
+    isValidPromise
+            .then((isValid) => {
+              console.log("isValid&&&&&&&&&&&", isValid, errors);
+              if (isValid) {
+                console.log("formmmData",formData);
+                
+                insertData();
+                
+              } else {
+                console.log("Form has errors:", errors);
+                
+              }
+            });
 
+   
+    
+      // setWarningModal(true);
+    };
+  const insertData = () => {
+    setIsLoading(true);
+
+    insertPaymentData({ data: formData, jobId: jobId})
+      .then((result : any) => {
+        if (result && result.status) {
+          setOrderId(result.id);
+          setEmpId(result.empId); 
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching drafts:", error);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
+  
+  
+    // const validateForm = (): Promise<boolean> => {
+    //   return new Promise((resolve, reject) => {
+    //     // Filter out fields with no data before validation
+    //     const filteredFormData = Object.fromEntries(
+    //       Object.entries(formData).filter(
+    //         ([key, value]) => value !== null && value !== ""
+    //       )
+    //     );
+    
+    //     validationSchema
+    //       .validate(filteredFormData, {
+    //         abortEarly: false,
+    //       })
+    //       .then(() => {
+    //         setErrors({}); // Clear any previous errors
+    //         resolve(true); // Resolve as valid
+    //       })
+    //       .catch((validationErrors) => {
+    //         if (validationErrors instanceof Yup.ValidationError) {
+    //           const formErrors: { [key: string]: string } = {};
+    //           validationErrors.inner.forEach((error) => {
+    //             if (error.path) {
+    //               formErrors[error.path] = error.message;
+    //             }
+    //           });
+    //           setErrors(formErrors); // Set the errors
+    //         }
+    //         reject(false); // Reject as invalid
+    //       });
+    //   });
+    // };
+     const validateField = (fieldName: string, value:any) => {
+        console.log("Validation", value);
+        let validationPromise;
+          validationPromise = instantValidationSchema.validateAt(fieldName, {
+            [fieldName]: value,
+          });
+        return validationPromise
+          .then(() => {
+            setErrors((prev) => {
+              const { [fieldName]: _, ...rest } = prev; // Remove the field from the errors object
+              return rest; // Return the new object without the specified field
+            });
+          })
+          .catch((error) => {
+            if (error instanceof Yup.ValidationError) {
+              setErrors((prev) => ({ ...prev, [fieldName]: error.message }));
+            }
+          });
+      };
+    const handleInputChange = (key:string, value:any) => {
+      console.log("handle", key, value, formData);
+      setFormData((prev) => ({ ...prev, [key]: value }));
+      console.log("handle", key, value);
+      // if(key=='contactNumber' && value!=null){
+      validateField(key, value)
+        .then(() => {
+          console.log(`Validation succeeded for ${key}`);
+        })
+        .catch((error) => {
+          console.error(`Validation failed for ${key}:`, error);
+        });
+      // }
+    };
+console.log("errors", errors);
     const [promoteModalOpened, setPromoteModalOpened] = useState(false);
 
     const handlePromoteJob = () => {
@@ -183,9 +369,9 @@ payment
                   clearable
                   onChange={(value) => value !== null && value !== undefined && setBudgetType(value)}
                   data={[
-                    { value: "daily", label: "Daily" },
-                    { value: "weekly", label: "Weekly" },
-                    { value: "monthly", label: "Monthly" },
+                    { value: "oneday", label: "One Day" },
+                    { value: "oneweek", label: "One Week" },
+                    { value: "onemonth", label: "One Month" },
                     // { value: "total", label: "Total" },
                   ]}
                   placeholder="Select budget type"
@@ -232,17 +418,17 @@ payment
               fullWidth
               style={buttonStyle}
               onClick={() => {
-                if (budgetType === "daily") {
+                if (budgetType === "oneday") {
                   // setTotalPrice(60+price);
-                  setPrice(50);
-                  setTax(10);
-                } else if (budgetType === "weekly") {
-                  // setTotalPrice(30+price);
-                  setPrice(20);
-                  setTax(10);
-                } else if (budgetType === "monthly") {
-                  // setTotalPrice(action=="payment"?110:10);
                   setPrice(10);
+                  setTax(10);
+                } else if (budgetType === "oneweek") {
+                  // setTotalPrice(30+price);
+                  setPrice(30);
+                  setTax(10);
+                } else if (budgetType === "onemonth") {
+                  // setTotalPrice(action=="payment"?110:10);
+                  setPrice(100);
                   setTax(10);
                 }
                 // else if (budgetType === "total") {
@@ -435,19 +621,20 @@ payment
             <form>
               <Grid gutter={20}>
                 {/* Employer's Name */}
+              {/* {jobId} */}
                 <Grid.Col span={6}>
                   <TextInput
                     size="md"
                     label="Employer's Name"
                     placeholder="Enter employer's name"
-                    value={formData.employersName}
+                    value={formData.employerName}
                     onChange={(e) =>
-                      handleInputChange("employersName", e.target.value)
+                      handleInputChange("employerName", e.target.value)
                     }
                   />
-                  {errors.employersName && (
+                  {errors.employerName && (
                     <Text color="red" size="sm">
-                      {errors.employersName}
+                      {errors.employerName}
                     </Text>
                   )}
                 </Grid.Col>
@@ -456,16 +643,16 @@ payment
                 <Grid.Col span={6}>
                   <TextInput
                     size="md"
-                    label="Cardholder's Name"
-                    placeholder="Enter cardholder's name"
-                    value={formData.cardholderName}
+                    label="Employer's Email"
+                    placeholder="Enter Email Address"
+                    value={formData.emailAddress}
                     onChange={(e) =>
-                      handleInputChange("cardholderName", e.target.value)
+                      handleInputChange("emailAddress", e.target.value)
                     }
                   />
-                  {errors.cardholderName && (
+                  {errors.emailAddress && (
                     <Text color="red" size="sm">
-                      {errors.cardholderName}
+                      {errors.emailAddress}
                     </Text>
                   )}
                 </Grid.Col>
@@ -492,11 +679,11 @@ payment
                 <Grid.Col span={6}>
                   <TextInput
                     size="md"
-                    label="Card Number"
-                    placeholder="1234 5678 9101 1121"
-                    value={formData.cardNumber}
+                    label="Contact Number"
+                    placeholder="Enter contact number"
+                    value={formData.contactNumber}
                     onChange={(e) =>
-                      handleInputChange("cardNumber", e.target.value)
+                      handleInputChange("contactNumber", e.target.value)
                     }
                     rightSection={
                       <div
@@ -506,43 +693,8 @@ payment
                           marginRight: "70px",
                         }}
                       >
-                        <img
-                          src="/images/MasterCard.png"
-                          alt="mastercard"
-                          width={25}
-                          height={18}
-                        />
-                        <img
-                          src="/images/Visa.png"
-                          alt="visa"
-                          width={25}
-                          height={19}
-                        />
-                        <img
-                          src="/images/Amex.png"
-                          alt="amex"
-                          width={25}
-                          height={18}
-                        />
+                        
                       </div>
-                    }
-                  />
-                  {errors.cardNumber && (
-                    <Text color="red" size="sm">
-                      {errors.cardNumber}
-                    </Text>
-                  )}
-                </Grid.Col>
-
-                {/* Contact Number */}
-                <Grid.Col span={6}>
-                  <TextInput
-                    size="md"
-                    label="Contact Number"
-                    placeholder="Enter contact number"
-                    value={formData.contactNumber}
-                    onChange={(e) =>
-                      handleInputChange("contactNumber", e.target.value)
                     }
                   />
                   {errors.contactNumber && (
@@ -552,58 +704,7 @@ payment
                   )}
                 </Grid.Col>
 
-                {/* Expiration Date */}
-                <Grid.Col span={6}>
-                  <div style={{ display: "flex", gap: "12px" }}>
-                    <div style={{ flex: 1 }}>
-                      <TextInput
-                        size="md"
-                        label="Expiration Date"
-                        placeholder="MM / YY"
-                        value={formData.expirationDate}
-                        onChange={(e) =>
-                          handleInputChange("expirationDate", e.target.value)
-                        }
-                      />
-                      {errors.expirationDate && (
-                        <Text color="red" size="sm">
-                          {errors.expirationDate}
-                        </Text>
-                      )}
-                    </div>
-
-                    <div style={{ flex: 1 }}>
-                      <TextInput
-                        size="md"
-                        label="CVC"
-                        placeholder="Enter CVC"
-                        value={formData.cvc}
-                        onChange={(value) => handleInputChange("cvc", value)}
-                        rightSection={
-                          <div
-                            style={{
-                              display: "flex",
-                              gap: "5px",
-                              marginRight: "10px",
-                            }}
-                          >
-                            <img
-                              src="/images/CVC.png"
-                              alt="mastercard"
-                              width={25}
-                              height={18}
-                            />
-                          </div>
-                        }
-                      />
-                      {errors.cvc && (
-                        <Text color="red" size="sm">
-                          {errors.cvc}
-                        </Text>
-                      )}
-                    </div>
-                  </div>
-                </Grid.Col>
+              
 
                 {/* Billing Address */}
                 <Grid.Col span={6}>

@@ -25,7 +25,7 @@ export async function GET(request: Request) {
       const { data: empData, error: empError } = await supabase
         .from("employer_details")
         .select("id")
-        .eq("email", session?.user?.email)
+        .eq("id", session?.user?.id)
         .maybeSingle(); // Use maybeSingle() to handle zero rows gracefully
 
       if (empError) {

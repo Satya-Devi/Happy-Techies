@@ -49,6 +49,8 @@ interface JobRowData {
   created_at?: string;
   title?: string;
   is_archived?: boolean;
+  applicants_count?: number;
+  company_name?: string;
 }
 const renderStatus = (
   deadline: string | undefined,
@@ -372,7 +374,7 @@ const MyJobs = ({ showPagination, pagename }: Props) => {
               onClick={() => router.push(`/applicants-preview?id=${job.id}`)}
             >
               {" "}
-              0 Applicants
+              {job?.applicants_count ? job?.applicants_count:0 } Applicants
             </div>
             <div>
               <Button
@@ -474,7 +476,7 @@ const MyJobs = ({ showPagination, pagename }: Props) => {
                     padding: "8px 16px",
                   }}
                 >
-                  Delete Details
+                  Delete Job
                 </Menu.Item>
               )}
               {(job?.job_status === null || job?.job_status === undefined) && (
@@ -502,7 +504,7 @@ const MyJobs = ({ showPagination, pagename }: Props) => {
                   }}
                   onClick={() =>
                     router.push(
-                      `/payment?jobId=${job.id}&jobTitle=${job.job_title}`
+                      `/payment?jobId=${job.id}&jobTitle=${job.job_title}&companyName=${job.company_name}`
                     )
                   }
                 >

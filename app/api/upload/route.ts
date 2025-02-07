@@ -30,7 +30,7 @@ export async function POST(req: Request) {
     const { data: publicURLData } = supabase.storage
       .from('images')
       .getPublicUrl(`uploads/${uniqueFileName}`);
-console.log("UUUUUUUUUUUUUURRRRRRRRRRRRRRRLLLLLLLLLL",publicURLData)
+
     return NextResponse.json({
       success: true,
       url: publicURLData.publicUrl

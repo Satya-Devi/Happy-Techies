@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { SFProRounded } from "@/app/layout";
+
 import {
   Button,
   TextInput,
@@ -23,7 +24,7 @@ import { useRouter } from "next/navigation";
 import * as Yup from "yup";
 import Search from "../Search";
 import PaymentForm from "@/components/Payment/Payment";
-import {saveJob} from "@/app/post-job/action";
+import { saveJob } from "@/app/post-job/action";
 const validationSchema = Yup.object().shape({
   // imageUrl: Yup.mixed()
   //   .required("Company logo is required")
@@ -194,19 +195,15 @@ const validationSchema = Yup.object().shape({
   // deadline: Yup.date()
   //   .min(new Date(), "Deadline must not be less than today")
   //   .required("Deadline is required"),
-    deadline: Yup.date()
-  // .nullable()
-  .required("Deadline is required")
-  .test(
-    "is-future-date",
-    "Deadline must not be less than today",
-    (value) => {
+  deadline: Yup.date()
+    // .nullable()
+    .required("Deadline is required")
+    .test("is-future-date", "Deadline must not be less than today", (value) => {
       if (!value) return true; // Skip validation if no date is selected (handled by .required())
       const today = new Date();
       today.setHours(0, 0, 0, 0); // Reset time to compare only dates
       return value >= today;
-    }
-  ),
+    }),
   skills: Yup.array()
     .of(Yup.string().required("Each skill is required"))
     .min(1, "At least one skill is required")
@@ -259,9 +256,6 @@ const draftValidationSchema = Yup.object().shape({
       /^[a-zA-Z0-9]+(?:[-'\s][a-zA-Z0-9]+)*$/,
       "Employer Name can only include letters, numbers, spaces, hyphens, and apostrophes"
     ),
-
-
-
 
   employerWebsite: Yup.string()
     .nullable()
@@ -337,18 +331,14 @@ const draftValidationSchema = Yup.object().shape({
   // deadline: Yup.date()
   //   .min(new Date(), "Deadline must not be less than today")
   //   .nullable(),
-    deadline: Yup.date()
-  .nullable()
-  .test(
-    "is-future-date",
-    "Deadline must not be less than today",
-    (value) => {
+  deadline: Yup.date()
+    .nullable()
+    .test("is-future-date", "Deadline must not be less than today", (value) => {
       if (!value) return true; // Skip validation if no date is selected (handled by .required())
       const today = new Date();
       today.setHours(0, 0, 0, 0); // Reset time to compare only dates
       return value >= today;
-    }
-  ),
+    }),
   skills: Yup.array()
     .nullable()
     .transform((value) => (!value ? [] : value))
@@ -381,13 +371,14 @@ type Props = {
     id?: any;
     message?: string;
     action?: string;
+
   };
 
-  onSubmit: (data: any) => {};
   data: any;
+ 
 };
 
-const EmpJobForm = ({ searchParams, onSubmit, data }: Props) => {
+const EmpJobForm = ({ searchParams, data, }: Props) => {
   let formValue = null;
   console.log("FFFFFFFFFFFFFFFFFFFFF", data);
   if (data?.[0]?.application_deadline)
@@ -448,6 +439,8 @@ const EmpJobForm = ({ searchParams, onSubmit, data }: Props) => {
   const [imageFile, setImageFile] = useState<string | null>(null);
   const [showPayment, setShowPayment] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [jobId, setJobId] = useState("");
+  const [isDraftSaving, setIsDraftSaving] = useState(false);
 
   //const acceptedFormats = "Only .jpg, .jpeg, .png .webp, .avif formats allowed";
   const acceptedFormats =
@@ -468,17 +461,17 @@ const EmpJobForm = ({ searchParams, onSubmit, data }: Props) => {
     }
   }, []);
 
-  const handleImageUpload = (file:any) => {
+  const handleImageUpload = (file: any) => {
     if (!file) return Promise.reject(new Error("No file provided"));
-  
+
     if (file instanceof File) {
       const reader = new FileReader();
       reader.readAsDataURL(file);
-  
+
       return new Promise((resolve, reject) => {
         reader.onload = () => {
           const base64Data = reader.result;
-          
+
           fetch("/api/upload", {
             method: "POST",
             headers: {
@@ -506,16 +499,15 @@ const EmpJobForm = ({ searchParams, onSubmit, data }: Props) => {
               reject(error);
             });
         };
-  
+
         reader.onerror = () => {
           reject(new Error("File reading failed"));
         };
       });
     }
-  
+
     return Promise.reject(new Error("Invalid file type"));
   };
-  
 
   // const validateField = async (fieldName: string, value: any) => {
   //   try {
@@ -539,11 +531,11 @@ const EmpJobForm = ({ searchParams, onSubmit, data }: Props) => {
   //     }
   //   }
   // };
-  const validateField = (fieldName: string, value:any) => {
+  const validateField = (fieldName: string, value: any) => {
     console.log("Validation", value);
-  
+
     let validationPromise;
-  
+
     if (fieldName === "salaryMax") {
       validationPromise = draftValidationSchema.validateAt(fieldName, {
         [fieldName]: value,
@@ -554,7 +546,7 @@ const EmpJobForm = ({ searchParams, onSubmit, data }: Props) => {
         [fieldName]: value,
       });
     }
-  
+
     return validationPromise
       .then(() => {
         setErrors((prev) => {
@@ -568,7 +560,7 @@ const EmpJobForm = ({ searchParams, onSubmit, data }: Props) => {
         }
       });
   };
-  
+
   // const handleInputChange = async (key: string, value: any) => {
   //   console.log("handle", key, value, formData);
   //   if (key === "imageUrl" && value) {
@@ -580,16 +572,16 @@ const EmpJobForm = ({ searchParams, onSubmit, data }: Props) => {
   //   await validateField(key, value);
   // };
 
-  const handleInputChange = (key:string, value:any) => {
+  const handleInputChange = (key: string, value: any) => {
     console.log("handle", key, value, formData);
-    
+
     if (key === "imageUrl" && value) {
       setImageFile(value);
       setFormData((prev) => ({ ...prev, ["imageUrl"]: value }));
     }
-  
+
     setFormData((prev) => ({ ...prev, [key]: value }));
-  
+
     validateField(key, value)
       .then(() => {
         console.log(`Validation succeeded for ${key}`);
@@ -598,7 +590,6 @@ const EmpJobForm = ({ searchParams, onSubmit, data }: Props) => {
         console.error(`Validation failed for ${key}:`, error);
       });
   };
-  
 
   // const validateForm = async (): Promise<boolean> => {
   //   try {
@@ -619,10 +610,10 @@ const EmpJobForm = ({ searchParams, onSubmit, data }: Props) => {
   //     return false;
   //   }
   // };
-  
-  
+
   const validateForm = (): Promise<boolean> => {
-    return validationSchema.validate(formData, { abortEarly: false })
+    return validationSchema
+      .validate(formData, { abortEarly: false })
       .then(() => {
         console.log("NOOOOOO ERRRRRORRRRS");
         setErrors({});
@@ -631,7 +622,7 @@ const EmpJobForm = ({ searchParams, onSubmit, data }: Props) => {
       .catch((validationErrors) => {
         console.log("ERROR: " + validationErrors);
         if (validationErrors instanceof Yup.ValidationError) {
-          const formErrors :{ [key: string]: string } = {};
+          const formErrors: { [key: string]: string } = {};
           validationErrors.inner.forEach((error) => {
             formErrors[error.path || ""] = error.message;
           });
@@ -641,8 +632,7 @@ const EmpJobForm = ({ searchParams, onSubmit, data }: Props) => {
         return false;
       });
   };
-  
-  
+
   const hasAtLeastOneField = () => {
     const { isDraft, ...dataToCheck } = formData;
     return Object.entries(dataToCheck).some(([key, value]) => {
@@ -692,7 +682,7 @@ const EmpJobForm = ({ searchParams, onSubmit, data }: Props) => {
 
   //       console.log("Success", res);
   //       if (res && "status" in res && res.status) {
-          
+
   //         // router.push("/payment");
   //         // return redirect("/payment");
   //       }
@@ -701,7 +691,7 @@ const EmpJobForm = ({ searchParams, onSubmit, data }: Props) => {
   //       else{
   //       setShowPayment(true);
   //     }
-        
+
   //     } else {
   //       if (imageFile) {
   //         const url = await handleImageUpload(imageFile);
@@ -752,119 +742,136 @@ const EmpJobForm = ({ searchParams, onSubmit, data }: Props) => {
   //     console.log("Form has errors:", errors);
   //   }
   // };
-  
-  
-  const handleSubmit = ({ is_draft, action }: { is_draft?: boolean; action?: string }): Promise<void> => {
+
+  const handleSubmit = ({
+    is_draft,
+    action,
+  }: {
+    is_draft?: boolean;
+    action?: string;
+  }): Promise<void> => {
     setIsSubmitting(true);
     return new Promise((resolve, reject) => {
       console.log("submit$$$$$$$---", formData, is_draft);
       let isValidPromise;
-  
+
       if (is_draft) {
         isValidPromise = Promise.resolve(Object.keys(errors).length === 0);
       } else {
         console.log("VALIDATION", Object.keys(errors).length, errors);
         isValidPromise = validateForm();
       }
-  
-      isValidPromise
-        .then((isValid) => {
-          console.log("isValid&&&&&&&&&&&", isValid, errors);
-          if (isValid) {
-            let data = formData;
-            data.isDraft = action === "payment" ? true : is_draft ?? false;
-  
-            let uploadPromise = Promise.resolve();
-  
-            if (imageFile) {
-              uploadPromise = handleImageUpload(imageFile).then((url) => {
-                data.imageUrl = typeof url === "string" ? url : "";
-              });
-            }
-  
-            uploadPromise
-              .then(() => {
-                if (searchParams?.id) {
-                  data.jobId = searchParams.id;
-                }
-  console.log("sasat33",is_draft)
 
-                if (!is_draft ){
-                  if( showPayment) {
-                  console.log("sasat2")
+      isValidPromise.then((isValid) => {
+        console.log("isValid&&&&&&&&&&&", isValid, errors);
+        if (isValid) {
+          let data = formData;
+          data.isDraft = action === "payment" ? true : is_draft ?? false; //If is_draft is not null or undefined, then data.isDraft is assigned the value of is_draft.
+          //Otherwise, it is assigned false.
+
+          let uploadPromise = Promise.resolve();
+
+          if (imageFile) {
+            uploadPromise = handleImageUpload(imageFile).then((url) => {
+              data.imageUrl = typeof url === "string" ? url : "";
+            });
+          }
+
+          uploadPromise
+            .then(() => {
+              if (searchParams?.id) {
+                data.jobId = searchParams.id;
+              }
+              console.log("sasat33", is_draft);
+
+              if (!is_draft) {
+                if (showPayment) {
+                  console.log("sasat2");
                   return saveJob(data).then((res) => {
                     console.log("Success", res);
-                    if (res && 'status' in res && res.status) {
+                    if (res && "status" in res && res.status) {
+                      if (res && "id" in res && res.id) {
+                        setJobId(res.id);
+                      }
                       resolve();
-                    } 
+                    }
                   });
-                }
-                else {
-                  console.log("sasat1")
+                } else {
+                  saveJob(data).then((res) => {
+                    console.log("Success", res);
+                    if (res && "status" in res && res.status) {
+                      if (res && "id" in res && res.id) {
+                        setJobId(res.id);
+                      }
+                    }
+                  });
+                  console.log("sasat1");
                   setShowPayment(true);
+                 
                   setIsSubmitting(false);
                   reject("Failed to submit job.");
                 }
               } else {
-                  return saveJob(data).then((res) => {
-                    console.log("Success", res);
-                    if (res && 'status' in res && res.status) {
-                      setModalOpen(true);
-                      setFormData({
-                        companyLogo: null,
-                        employerName: "",
-                        employerWebsite: "",
-                        jobTitle: "",
-                        jobType: "",
-                        solutionArea: "",
-                        jobLocation: "",
-                        workplaceType: "",
-                        salaryMin: "",
-                        salaryMax: "",
-                        experience: "",
-                        deadline: null,
-                        skills: [],
-                        jobDescription: "",
-                        isDraft: false,
-                        imageUrl: "",
-                        jobId: "",
-                      });
-                      resolve();
-                    } else {
-                      setModalOpen(true);
-                      setModalTitle("Fail!");
-                      setModalText("Something went wrong!");
-                      reject("Job submission failed.");
+                return saveJob(data).then((res) => {
+                  console.log("Success", res);
+                  if (res && "status" in res && res.status) {
+                    if (res && "id" in res && res.id) {
+                      setJobId(res.id);
                     }
-                  });                }
-              })
-              .then(() => {
-                console.log("Form submitted successfully1:", data, searchParams);
-                console.log("Form submitted successfully:", formData);
-              })
-              .catch((error) => {
-                console.error("Error during submission:", error);
-                setModalOpen(true);
-                setModalTitle("Fail!");
-                setModalText("Something went wrong!");
-                reject(error);
-              })
-              .finally(() => {
-                setIsSubmitting(false);
-              });;
-          } else {
-            console.log("Form has errors:", errors);
-            setIsSubmitting(false);
-            reject("Form validation failed.");
-          }
-        });
+                    setModalOpen(true);
+                    setFormData({
+                      companyLogo: null,
+                      employerName: "",
+                      employerWebsite: "",
+                      jobTitle: "",
+                      jobType: "",
+                      solutionArea: "",
+                      jobLocation: "",
+                      workplaceType: "",
+                      salaryMin: "",
+                      salaryMax: "",
+                      experience: "",
+                      deadline: null,
+                      skills: [],
+                      jobDescription: "",
+                      isDraft: false,
+                      imageUrl: "",
+                      jobId: "",
+                    });
+                    setPreviewUrl(null);
+                    resolve();
+                  } else {
+                    setModalOpen(true);
+                    setModalTitle("Fail!");
+                    setModalText("Something went wrong!");
+                    reject("Job submission failed.");
+                  }
+                });
+              }
+            })
+            .then(() => {
+              console.log("Form submitted successfully1:", data, searchParams);
+              console.log("Form submitted successfully:", formData);
+            })
+            .catch((error) => {
+              console.error("Error during submission:", error);
+              setModalOpen(true);
+              setModalTitle("Fail!");
+              setModalText("Something went wrong!");
+              reject(error);
+            })
+            .finally(() => {
+              setIsSubmitting(false);
+            });
+        } else {
+          console.log("Form has errors:", errors);
+          setIsSubmitting(false);
+          reject("Form validation failed.");
+        }
+      });
     });
   };
-  
-   
-  
-  
-  
+
   // const handleDraft = async () => {
   //   console.log("Form 6789saved successfully");
   //   setFormData((prev) => ({ ...prev, ["isDraft"]: true }));
@@ -880,12 +887,12 @@ const EmpJobForm = ({ searchParams, onSubmit, data }: Props) => {
   // };
   const handleDraft = () => {
     console.log("Form 6789 saved successfully");
-  
+
     setFormData((prev) => ({ ...prev, isDraft: true }));
     setModalText("Job has been successfully saved as a draft!");
-    
+
     console.log("Form 6789 saved successfully", hasAtLeastOneField());
-  
+    setIsDraftSaving(true);
     if (hasAtLeastOneField()) {
       handleSubmit({ is_draft: true })
         .then(() => {
@@ -893,20 +900,23 @@ const EmpJobForm = ({ searchParams, onSubmit, data }: Props) => {
         })
         .catch((error) => {
           console.error("Error while saving draft:", error);
+        })
+        .finally(() => {
+          setIsDraftSaving(false);
         });
     } else {
       setModalText("Please enter at least one field to save as a draft.");
       setWarningModal(true);
+      setIsDraftSaving(false);
     }
   };
-  
+
   interface ImagePreviewWrapperProps {
     file: File | string | null;
   }
-const showPaymentpage=()=>{
-  setShowPayment(false);
-
-}
+  const showPaymentpage = () => {
+    setShowPayment(false);
+  };
   const ImagePreviewWrapper = ({ file }: ImagePreviewWrapperProps) => {
     const [preview, setPreview] = useState<string | null>(null);
 
@@ -954,24 +964,35 @@ const showPaymentpage=()=>{
     ) : null;
   };
 
-  const [previewUrl, setPreviewUrl] = useState<string | null>(data?.[0]?.employer_logo || null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(
+    data?.[0]?.employer_logo || null
+  );
 
-useEffect(() => {
-  // Cleanup function for object URLs
-  return () => {
-    if (previewUrl && previewUrl.startsWith('blob:')) {
-      URL.revokeObjectURL(previewUrl);
-    }
-  };
-}, [previewUrl]);
+  useEffect(() => {
+    // Cleanup function for object URLs
+    return () => {
+      if (previewUrl && previewUrl.startsWith("blob:")) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    };
+  }, [previewUrl]);
 
-  return showPayment ? (
+  return (
+    <div>
+   
+    {showPayment ? 
+  (
     <div>
       {/* <PaymentForm setShowPayment={setShowPayment} handleSubmit={handleSubmit} /> */}
-      <PaymentForm setShowPayments={showPaymentpage} handleSubmit={handleSubmit} payment={true} />
-
+      <PaymentForm
+        setShowPayments={showPaymentpage}
+        handleSubmit={handleSubmit}
+        payment={true}
+        jobId={jobId}
+      />
     </div>
-  ) : (
+  ) : 
+  (
     <div>
       {/* <img 
   src="https://ozdzeyzskmvrqxwbkkuq.supabase.co/storage/v1/object/sign/images/uploads/1737098276506-Screenshot%20(8).png?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJpbWFnZXMvdXBsb2Fkcy8xNzM3MDk4Mjc2NTA2LVNjcmVlbnNob3QgKDgpLnBuZyIsImlhdCI6MTczNzEwMjExOCwiZXhwIjoxNzM3NzA2OTE4fQ.dqHXoiZzJjWaj1DFA_TW2XrN_URmP66X2xl9hJnDUVE&t=2025-01-17T08%3A21%3A59.151Z"
@@ -1071,12 +1092,14 @@ useEffect(() => {
                   valueComponent={() => {
                     const displayUrl = previewUrl || formData.imageUrl;
                     return displayUrl ? (
-                      <div style={{
-                        width: "100%",
-                        height: "120px",
-                        pointerEvents: "none",
-                        position: "relative",
-                      }}>
+                      <div
+                        style={{
+                          width: "100%",
+                          height: "120px",
+                          pointerEvents: "none",
+                          position: "relative",
+                        }}
+                      >
                         <img
                           src={displayUrl}
                           alt="Preview"
@@ -1567,6 +1590,7 @@ useEffect(() => {
                   size="md"
                   label="Preferred Years Of Experience"
                   placeholder="Experience"
+                  required
                   // withAsterisk
                   min={0}
                   value={formData.experience}
@@ -1699,62 +1723,30 @@ useEffect(() => {
         <Button
           type="submit"
           size="md"
+          disabled={isDraftSaving}
           style={{
-            border: "2px solid #004A93", // Correct property name
-            backgroundColor: "#F7FAFC", // Correct property name
+            border: "2px solid #004A93",
+            backgroundColor: "#F7FAFC",
             color: "#004A93",
           }}
-          // style={{
-          //   backgroundColor: "#004A93", // Correct property name
-          //   color: "white",
-          // }}
           onClick={handleDraft}
         >
-          Save Draft
+          {isDraftSaving ? "Saving..." : "Save as Draft"}
         </Button>
         <Button
-  type="submit"
-  size="md"
-  loading={isSubmitting}
-  disabled={isSubmitting}
-  style={{
-    backgroundColor: "#004A93",
-    color: "white",
-    minWidth: "140px",
-    transition: "all 0.3s ease",
-  }}
-  onClick={() => handleSubmit({})}
->
-  {isSubmitting ? (
-    "Processing..."
-  ) : (
-    <>
-      Make Payment
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 24 24"
-        width="16"
-        height="16"
-        fill="none"
-        stroke="#ffffff"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        style={{
-          marginLeft: "6px",
-          opacity: isSubmitting ? 0 : 1,
-          transition: "opacity 0.2s",
-        }}
-      >
-        <circle cx="12" cy="12" r="10" />
-        <line x1="8" y1="12" x2="16" y2="12" />
-        <polyline points="12 8 16 12 12 16" />
-      </svg>
-    </>
-  )}
-</Button>
+          type="submit"
+          size="md"
+          style={{
+            backgroundColor: "#004A93",
+            color: "white",
+            minWidth: "140px",
+            transition: "all 0.3s ease",
+          }}
+          onClick={() => handleSubmit({})}
+        >
+          Make Payment
+        </Button>
 
-    
         <Modal
           opened={isModalOpen}
           onClose={() => setModalOpen(false)}
@@ -1825,7 +1817,10 @@ useEffect(() => {
         </Modal>
       </Group>
     </div>
-  );
+  )
+  }
+  </div>
+)
 };
 
 export default EmpJobForm;

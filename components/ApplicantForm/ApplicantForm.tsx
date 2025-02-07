@@ -11,11 +11,15 @@ import {
   Select,
   Textarea,
   FileInput,
+  Title,
+  Modal,
+  Text,
 } from "@mantine/core";
 import { createClient } from "@/utils/supabase/client";
 import { DateInput } from "@mantine/dates";
 import { useRouter } from "next/navigation";
 import { insertApplicationData } from "@/app/apply-form/action";
+import { FaAlignRight } from "react-icons/fa";
 interface ApplicantFormProps {
   // onSubmit: (data: any) => Promise<{ id: string; status: boolean }>;
   jobId?: string;
@@ -33,6 +37,8 @@ const ApplicantForm = ({ jobId }: ApplicantFormProps) => {
     certification: "",
     uploadResume: null as File | null,
     uploadCV: null as File | null,
+    resumeUrl: "",
+    cvUrl: "",
   });
 
   const [errors, setErrors] = useState({
@@ -51,7 +57,7 @@ const ApplicantForm = ({ jobId }: ApplicantFormProps) => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const handleInputChange = (key: string, value: any) => {
     setFormData((prev) => ({ ...prev, [key]: value }));
   };
@@ -99,19 +105,19 @@ const ApplicantForm = ({ jobId }: ApplicantFormProps) => {
   //   }
   // };
 
-  const handleFileUpload = (file: File, type: 'resume' | 'cv') => {
+  const handleFileUpload = (file: File, type: "resume" | "cv") => {
     if (!file) return Promise.reject(new Error("No file provided"));
-  
+
     const reader = new FileReader();
     reader.readAsDataURL(file);
-  
+
     return new Promise((resolve, reject) => {
       reader.onload = () => {
         const base64Data = reader.result;
-  
+
         // Determine the API route based on the type
-        const apiRoute = type === 'resume' ? "/api/resumes" : "/api/cvs";
-  
+        const apiRoute = type === "resume" ? "/api/resumes" : "/api/cvs";
+
         fetch(apiRoute, {
           method: "POST",
           headers: {
@@ -129,56 +135,110 @@ const ApplicantForm = ({ jobId }: ApplicantFormProps) => {
             return response.json();
           })
           .then((data) => {
-            setFormData((prev) => ({
-              ...prev,
-              [type === 'resume' ? 'resumeUrl' : 'cvUrl']: data.url,
-            }));
+            // setFormData((prev) => ({
+            //   ...prev,
+            //   [type === 'resume' ? 'resumeUrl' : 'cvUrl']: data.url,
+            // }));
+            if (type === "resume") {
+              formData.resumeUrl = data?.url;
+            } else {
+              formData.cvUrl = data?.url;
+            }
             resolve(data?.url);
           })
           .catch(reject);
       };
-  
+
       reader.onerror = () => reject(new Error("File reading failed"));
     });
   };
-  
-  
+
   const handleSubmit = async () => {
     console.log("Submit data", formData);
-    setIsSubmitting(true);
-   
+    
     try {
       let uploadPromises = [];
-  
+      setIsSubmitting(true);
       if (formData.uploadResume) {
-        uploadPromises.push(handleFileUpload(formData.uploadResume, 'resume'));
+        uploadPromises.push(handleFileUpload(formData.uploadResume, "resume"));
       }
       if (formData.uploadCV) {
-        uploadPromises.push(handleFileUpload(formData.uploadCV, 'cv'));
+        uploadPromises.push(handleFileUpload(formData.uploadCV, "cv"));
       }
-  
-      await Promise.all(uploadPromises);
-  
-      // const result = await onSubmit({
-      //   ...formData,
-      //   jobId: jobId,
-      // });
-      insertApplicationData(
-        formData,jobId
-        
-      )
-      .then((result) => {
-        if (result.status) {
-          router.push("/application-success");
-        }
-      
-      })}
-     catch (error) {
-           console.error("Application submission failed:", error);
-         } finally {
-           setIsSubmitting(false);
-         }
-  
+
+      // Execute all upload promises and then handle further logic
+      Promise.all(uploadPromises)
+        .then(() => {
+          let data = { ...formData }; // Create a copy of formData
+          data.uploadResume = null;
+          data.uploadCV = null;
+
+          console.log("data", data, formData);
+
+          // Insert application data
+          return insertApplicationData(data, jobId);
+        })
+        .then((result) => {
+          if (result.status) {
+            setIsModalOpen(true);
+            setFormData({
+              employerName: "",
+              phoneNumber: "",
+              experience: "",
+              startDate: "",
+              email: "",
+              employmentstatus: "",
+              linkedinProfile: "",
+              certification: "",
+              uploadResume: null,
+              uploadCV: null,
+              resumeUrl: "",
+              cvUrl: "",
+            });
+          }
+        })
+        .catch((error) => {
+          console.error("Error occurred:", error);
+        });
+    } catch (error) {
+      console.error("Unexpected error:", error);
+    } finally {
+      // try {
+      //   let uploadPromises = [];
+
+      //   if (formData.uploadResume) {
+      //     uploadPromises.push(handleFileUpload(formData.uploadResume, 'resume'));
+      //   }
+      //   if (formData.uploadCV) {
+      //     uploadPromises.push(handleFileUpload(formData.uploadCV, 'cv'));
+      //   }
+
+      //   await Promise.all(uploadPromises);
+
+      //   // const result = await onSubmit({
+      //   //   ...formData,
+      //   //   jobId: jobId,
+      //   // });
+      //   let data=formData;
+      //   data.uploadResume=null;
+      //   data.uploadCV=null;
+      //   console.log("data",data,formData);
+      //   insertApplicationData(
+      //     data,jobId
+
+      //   )
+      //   .then((result) => {
+      //     if (result.status) {
+      //       router.push("/application-success");
+      //     }
+
+      //   })}
+      //  catch (error) {
+      //        console.error("Application submission failed:", error);
+      //      }
+      setIsSubmitting(false);
+    }
+
     //   if (result.status) {
     //     router.push("/application-success");
     //   }
@@ -186,16 +246,60 @@ const ApplicantForm = ({ jobId }: ApplicantFormProps) => {
     //   console.error("Application submission failed:", error);
     // } finally {
     //   setIsSubmitting(false);
-     }
-  
-  
+  };
 
   const startDateValue = formData.startDate
     ? new Date(formData.startDate)
     : null;
 
+  const closeModal = () => {
+    setIsModalOpen(false);
+    router.push("/jobs");
+  };
+
   return (
     <div>
+      <Modal
+        opened={isModalOpen}
+        centered
+        onClose={() => setIsModalOpen(false)}
+          size="md"
+      >
+          <Box ml={10} mr={10} mb={10}></Box>
+         <Title
+                        ta="left"
+                        style={{
+                        fontSize:20
+                      }}
+                        // order={1}
+                        // className={SFProRounded.className}
+                        c="blue"
+                        mb={10}
+                      >
+                        { "Success!"}
+                        {/* {searchParams?.message && searchParams.message == "Success" ? "Success!" : "Fail!"} */}
+                      </Title>
+        <Text>Form Submitted Successfully</Text>
+        
+        <Group justify="flex-end">
+        <Button  style={{
+           backgroundColor: "#004a93",
+           color: "white",
+           alignItems: "right",
+           // padding: "10px",
+           borderRadius: "20px",
+           height: "40px",
+           fontSize: "16px",
+           fontWeight: 500,
+           border: "none",
+           cursor: "pointer",
+           transition: "background-color 0.3s",
+        }}
+        onClick={closeModal}>
+          Close
+        </Button>
+        </Group>
+      </Modal>
       <Box
         mx="auto"
         p="lg"
@@ -522,7 +626,7 @@ const uploadStyles = {
     paddingBottom: "11px",
   },
   placeholder: {
-    display:"flex",
+    display: "flex",
     justifyContent: "center",
     textAlign: "center",
     fontSize: "20px",

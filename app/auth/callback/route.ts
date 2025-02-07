@@ -21,11 +21,16 @@ export async function GET(request: Request) {
 
     const { session } = data;
     if (session) {
+      const { data:user, error} = await supabase.auth.getUser();
+      if (error) {
+        console.error("Error fetching user:", error?.message);
+        return NextResponse.redirect(`${origin}/auth/auth-code-error`);
+      }
+      console.log("User data", user);
       // Redirect to the jobs page after authentication
       return NextResponse.redirect(`${origin}/jobs`);
     }
   }
-
   // Fallback: if no code, or error occurs
   return NextResponse.redirect(`${origin}/auth/auth-code-error`);
 }

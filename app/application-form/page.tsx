@@ -1,5 +1,5 @@
 import { Hero } from "@/components/Hero/Hero";
-import ApplicantForm from "@/components/ApplicantForm/ApplicantForm";
+import ApplicantView from "@/components/ApplicationView/ApplicationView";
 import { createClient } from "@/utils/supabase/server";
 import { fetchJobById } from "@/app/post-job/action";
 import { redirect } from "next/navigation";
@@ -18,12 +18,12 @@ export default async function PostJob({
       .select("*")
       .eq("id", data?.data?.user?.id);
 
-    console.log("SatyaDevi==========", empData);
+    // console.log("SatyaDevi==========", empData);
     if (empError) {
       console.error("Error fetching user:", empError);
       return;
     }
-    if (!(empData && empData.length > 0 && empData[0].is_employer_login)) {
+    if (!(empData && empData.length > 0)) {
       redirect("/employers-login");
       console.log("User data", empData);
     }
@@ -41,7 +41,7 @@ export default async function PostJob({
         page="post-job"
       />
 
-      <ApplicantForm
+      <ApplicantView id={searchParams?.id}
       />
     </div>
   );}

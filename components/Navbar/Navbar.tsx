@@ -39,12 +39,12 @@ export async function Navbar({ role, page }: { role?: string; page?: string }) {
         .select("*")
         .eq("id", user?.id);
 
-      console.log("SatyaDevi==========", empData);
+      // console.log("SatyaDevi==========", empData);
       if (empError) {
         console.error("Error fetching user:", empError);
         return;
       }
-      if (empData && empData.length > 0 && empData[0].is_employer_login) {
+      if (empData && empData.length > 0 ) {
         emp_user = true;
       }
     }

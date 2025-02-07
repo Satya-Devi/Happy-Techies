@@ -24,7 +24,7 @@ export default async function EditJob({
       return;
     }
 
-    if (!(empData && empData.length > 0 && empData[0].is_employer_login)) {
+    if (!(empData && empData.length > 0)) {
       console.log("User data====", empData);
       redirect("/employers-login");
     }

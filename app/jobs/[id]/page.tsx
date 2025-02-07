@@ -450,7 +450,7 @@ export default async function Page({ params }: { params: { id: string } }) {
                     size="lg"
                     fz={"md"}
                     color="#004a93"
-                    href={job.employer_id ? `/apply-form?job_id=${job.id}` : "/login"}
+                    href={job.employer_id ? `/apply-form?job_id=${job.id}` : job.job_listing_source_url?.toString()}
                     target="_blank"
                     rel="noopener noreferrer"
                     leftSection={

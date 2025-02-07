@@ -441,7 +441,7 @@ const EditJobForm = ({ searchParams, actions, onSubmit, data }: Props) => {
             justifyContent: "right",
           }}
         >
-          <IconEdit stroke={2} /> Edit
+          {/* <IconEdit stroke={2} /> Edit */}
         </div>
         <div className={classes.header}>
           <div style={{ display: "flex", gap: "20px", alignItems: "center" }}>

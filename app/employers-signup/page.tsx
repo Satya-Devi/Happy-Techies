@@ -124,6 +124,7 @@ export default function EmpSignup({
       email,
       password,
       options: {
+        data: { role: "employer" },
         emailRedirectTo: `${origin}/auth/empcallback`,
       },
     });

@@ -39,7 +39,7 @@ export async function POST(req: Request) {
 
     // Get the public URL
     const { data: publicURLData } = supabase.storage
-      .from("CVs")
+      .from("cvs")
       .getPublicUrl(`uploads/${uniqueFileName}`);
 
     return NextResponse.json({

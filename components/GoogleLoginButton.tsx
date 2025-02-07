@@ -30,28 +30,34 @@ export default function GoogleLoginButton({ role }: { role?: string }) {
         token: response.credential,
       })
       .then(({ data, error }) => {
+        console.log("Received----",error)
         if (error) throw error;
   
         console.log("Sign-in data:", data);
         const emailCred = data?.user?.email;
+        console.log("emailcred",emailCred);
         if (!emailCred) {
           console.warn("User data is not available");
           throw new Error("User email not found");
         }
   
         if (role == "Employer") {
+          console.log("yesyes")
           return supabase
             .from("employer_details")
             .select("id")
-            .eq("email", emailCred)
+            .eq("id", data?.session?.user?.id)
             .maybeSingle()
             .then(({ data: empData, error: empError }) => {
+              console.log("empdata,",empError);
+              console.log("emp", empData)
               if (empError) throw empError;
   
               const empDataInfo = data?.session?.user;
               const empNameMeta = data?.user?.user_metadata;
-  
+
               if (!empData) {
+                console.log("empdata,",empNameMeta,empDataInfo);
                 return supabase
                   .from("employer_details")
                   .insert([
@@ -66,7 +72,8 @@ export default function GoogleLoginButton({ role }: { role?: string }) {
                   ]);
               }
             });
-        } else {
+        } 
+        else {
           return supabase
             .from("users")
             .select("id")

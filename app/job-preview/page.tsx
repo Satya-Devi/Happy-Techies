@@ -31,7 +31,7 @@ export default async function JobPreviewPage({
     return null;
   }
 
-  if (!empData?.length || !empData[0].is_employer_login) {
+  if (!empData?.length) {
     console.warn("User is not logged in as an employer:", empData);
     redirect("/employers-login");
     return null;

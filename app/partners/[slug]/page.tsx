@@ -43,6 +43,9 @@ export default async function Page({ params }: { params: { slug: string } }) {
   const { data: jobs, error: error } = await supabase
     .from("jobs")
     .select()
+    .neq("is_draft", true)
+    .or("is_archived.is.null,is_archived.neq.true")
+    .or("job_status.is.null,job_status.eq.active")
     .textSearch("company_name", story.content.name);
 
   if (error) console.error(error);
@@ -50,7 +53,9 @@ export default async function Page({ params }: { params: { slug: string } }) {
   const glassdoorRating = await fetchGlassdoorRating(
     story.content.glassdoor_company_id
   );
-  const { rating = "N/A", reviewCount = 0 } = glassdoorRating || {};
+  const { rating = "N/A", reviewCount = 0 } = glassdoorRating ?? {};
+
+  //const { rating = "N/A", reviewCount = 0 } = glassdoorRating || {};
 
   return (
     <>

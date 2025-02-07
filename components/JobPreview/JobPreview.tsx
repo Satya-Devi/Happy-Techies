@@ -1058,7 +1058,7 @@ const JobPreview = ({ job, jobs }: { job: any; jobs: any[] }) => {
                     c="#004a93"
                     className={`${SFProRounded.className} ${classes.TitleHeader}`}
                   >
-                    {job.company_name || "No Title Available"}
+                    {job?.job_title || "No Title Available"}
                   </Title>
                 </Group>
 
@@ -1078,7 +1078,7 @@ const JobPreview = ({ job, jobs }: { job: any; jobs: any[] }) => {
                       color: "#000000B2",
                     }}
                   >
-                    Role: {job.job_title || "Not Specified"}
+                    Role: {job?.job_title || "Not Specified"}
                   </span>
                   <IconGolf
                     size={24}
