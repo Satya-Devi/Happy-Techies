@@ -1,0 +1,33 @@
+.overview_cards {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  justify-items: center;
+  gap: 25px;
+  padding-top: 20px;
+  flex-wrap: nowrap;
+
+  @media (max-width: 768px) {
+    flex-wrap: wrap;
+  }
+}
+
+.dashboardTitle {
+  text-align: center;
+  word-wrap: break-word;
+}
+
+.dashboardSubtitle {
+  text-align: center;
+  word-wrap: break-word;
+}
+
+@media (max-width: 768px) {
+  .dashboardTitle {
+    padding: 0 15px;
+  }
+
+  .dashboardSubtitle {
+    padding: 0 15px;
+  }
+}

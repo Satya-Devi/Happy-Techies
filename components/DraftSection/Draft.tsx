@@ -4,13 +4,12 @@ import { redirect } from "next/navigation";
 import DraftTable from "./DraftTable";
 import { Container, Text, Box } from "@mantine/core";
 import { ViewAllButton } from "@/components/Dashboard/ViewAllButton";
-export default async function Draft(
-//   {
-//   searchParams,
-// }: {
-//   searchParams: { [key: string]: string };
-// }
-) {
+export default async function Draft() {
+  //   {
+  //   searchParams,
+  // }: {
+  //   searchParams: { [key: string]: string };
+  // }
   const supabase = createClient();
   const userdata = await supabase.auth.getUser();
   console.log("User: ", userdata?.data?.user?.id);
@@ -32,8 +31,6 @@ export default async function Draft(
     redirect("/employers-login");
   }
 
-
- 
   return (
     <div>
       <Box
@@ -48,33 +45,17 @@ export default async function Draft(
       >
         <div
           style={{
-            fontSize: "23px",
+            fontSize: "clamp(18px, 4vw, 23px)",
             fontWeight: 600,
             color: "#000",
           }}
         >
           Saved Job Drafts
         </div>
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            justifyContent: "center",
-            alignItems: "center",
-            gap: "10px",
-            cursor: "pointer",
-          }}
-        >
-           <ViewAllButton redirectUrl={"/my-drafts"} />
-         
-        
-        </div>
+        <ViewAllButton redirectUrl={"/my-drafts"} />
       </Box>
       <div>
-        <DraftTable
-          pagename={"overview"}
-          showPagination={false}
-        />
+        <DraftTable pagename={"overview"} showPagination={false} />
       </div>
     </div>
   );

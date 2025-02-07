@@ -2,14 +2,12 @@
 import { Hero } from "@/components/Hero/Hero";
 import PaymentForm from "@/components/Payment/Payment";
 //import { useState } from "react";
-export default function PaymentPage(
-  {
-    searchParams,
-  }: {
-    searchParams: { [key: string]: string };
-  }
-) {
-  // const [showPayment, setShowPayment] = useState(false);  
+export default function PaymentPage({
+  searchParams,
+}: {
+  searchParams: { [key: string]: string };
+}) {
+  // const [showPayment, setShowPayment] = useState(false);
   const setShowPayments = () => {
     console.log("setShowPayment");
   };
@@ -19,11 +17,7 @@ export default function PaymentPage(
   };
 
   return (
-    <div
-      style={{
-        backgroundColor: "#FFFFFF",
-      }}
-    >
+    <div>
       <Hero
         title="Payment"
         subtitle=""
@@ -32,7 +26,7 @@ export default function PaymentPage(
         page="post-job"
       />
       <PaymentForm
-      jobId={searchParams?.jobId}
+        jobId={searchParams?.jobId}
         // setShowPayments={setShowPayments}
         // handleSubmit={handleSubmit}
       />
