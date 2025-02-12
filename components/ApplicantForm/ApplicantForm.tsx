@@ -11,19 +11,55 @@ import {
   Select,
   Textarea,
   FileInput,
-  Title,
   Modal,
   Text,
 } from "@mantine/core";
+import { SFProRounded } from "@/app/layout";
+import * as Yup from "yup";
 import { createClient } from "@/utils/supabase/client";
 import { DateInput } from "@mantine/dates";
 import { useRouter } from "next/navigation";
 import { insertApplicationData } from "@/app/apply-form/action";
-import { FaAlignRight } from "react-icons/fa";
+
 interface ApplicantFormProps {
-  // onSubmit: (data: any) => Promise<{ id: string; status: boolean }>;
   jobId?: string;
 }
+
+interface FormErrors {
+  [key: string]: string;
+}
+
+const validationSchema = Yup.object().shape({
+  employerName: Yup.string()
+    .min(2, "Name must be at least 2 characters")
+    .matches(/^[a-zA-Z\s]*$/, "Name can only contain letters")
+    .required("Employer Name is required"),
+  phoneNumber: Yup.string()
+    .matches(/^\+?[\d\s-]{10,}$/, "Please enter a valid phone number")
+    .required("Phone Number is required"),
+  experience: Yup.number()
+    .transform((value) => (isNaN(value) ? undefined : value))
+    .min(0, "Experience cannot be negative")
+    .max(50, "Please enter a realistic experience value")
+    .required("Experience is required")
+    .typeError("Experience must be a number"),
+  startDate: Yup.date()
+    .transform((value) => (value === "" ? undefined : value))
+    .typeError("Please select a valid date")
+    .required("Start Date is required")
+    .min(new Date(), "Start date must be in the future"),
+  email: Yup.string()
+    .email("Invalid email format")
+    .matches(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/, "Invalid email format")
+    .required("Email is required"),
+  employmentstatus: Yup.string().required("Employment Status is required"),
+  linkedinProfile: Yup.string()
+    .url("Invalid URL")
+    .matches(/linkedin\.com/, "Must be a LinkedIn URL")
+    .required("LinkedIn Profile is required"),
+  certification: Yup.string().required("Certification is required"),
+  uploadResume: Yup.mixed().required("Resume is required"),
+});
 
 const ApplicantForm = ({ jobId }: ApplicantFormProps) => {
   const [formData, setFormData] = useState({
@@ -40,212 +76,123 @@ const ApplicantForm = ({ jobId }: ApplicantFormProps) => {
     resumeUrl: "",
     cvUrl: "",
   });
-
-  const [errors, setErrors] = useState({
-    employerName: "",
-    phoneNumber: "",
-    experience: "",
-    startDate: "",
-    email: "",
-    employmentstatus: "",
-    linkedinProfile: "",
-    certification: "",
-    uploadResume: "",
-    uploadCV: "",
-  });
-
-  const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
+  const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const router = useRouter();
+
   const handleInputChange = (key: string, value: any) => {
     setFormData((prev) => ({ ...prev, [key]: value }));
+    // Immediate validation
+    validateField(key, value);
+
+    // Clear error when user starts typing
+    if (errors[key]) {
+      setErrors((prev) => {
+        const { [key]: _, ...rest } = prev;
+        return rest;
+      });
+    }
   };
 
-  // const handleSubmit = async () => {
-  //   setIsSubmitting(true);
-  //   try {
-  //     // Basic validation
-  //     if (!formData.uploadResume) {
-  //       setErrors((prev) => ({ ...prev, uploadResume: "Resume is required" }));
-  //       return;
-  //     }
+  const validateField = (fieldName: string, value: any) => {
+    validationSchema
+      .validateAt(fieldName, { [fieldName]: value })
+      .then(() => {
+        setErrors((prev) => {
+          const { [fieldName]: _, ...rest } = prev;
+          return rest;
+        });
+      })
+      .catch((error: Yup.ValidationError) => {
+        setErrors((prev) => ({ ...prev, [fieldName]: error.message }));
+      });
+  };
 
-  //     // Upload resume file to Supabase storage
-  //     const supabase = createClient();
-  //     const fileExt = formData.uploadResume.name.split(".").pop();
-  //     const fileName = `${Math.random()}.${fileExt}`;
-
-  //     const { data: uploadData, error: uploadError } = await supabase.storage
-  //       .from("resumes")
-  //       .upload(fileName, formData.uploadResume);
-
-  //     if (uploadError) {
-  //       throw new Error("Resume upload failed");
-  //     }
-
-  //     // Get public URL for resume
-  //     const {
-  //       data: { publicUrl },
-  //     } = supabase.storage.from("resumes").getPublicUrl(fileName);
-
-  //     const result = await onSubmit({
-  //       ...formData,
-  //       resumeUrl: publicUrl,
-  //       jobId: jobId,
-  //     });
-
-  //     if (result.status) {
-  //       router.push("/application-success");
-  //     }
-  //   } catch (error) {
-  //     console.error("Application submission failed:", error);
-  //   } finally {
-  //     setIsSubmitting(false);
-  //   }
-  // };
-
-  const handleFileUpload = (file: File, type: "resume" | "cv") => {
-    if (!file) return Promise.reject(new Error("No file provided"));
+  const handleFileUpload = async (file: File, type: "resume" | "cv") => {
+    if (!file) return;
 
     const reader = new FileReader();
     reader.readAsDataURL(file);
-
-    return new Promise((resolve, reject) => {
-      reader.onload = () => {
-        const base64Data = reader.result;
-
-        // Determine the API route based on the type
-        const apiRoute = type === "resume" ? "/api/resumes" : "/api/cvs";
-
-        fetch(apiRoute, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            file: base64Data,
-            fileName: file.name,
-          }),
-        })
-          .then((response) => {
-            if (!response.ok) {
-              throw new Error("Upload failed");
+    return new Promise<string>((resolve, reject) => {
+      reader.onload = async () => {
+        try {
+          const response = await fetch(
+            `/api/${type === "resume" ? "resumes" : "cvs"}`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                file: reader.result,
+                fileName: file.name,
+              }),
             }
-            return response.json();
-          })
-          .then((data) => {
-            // setFormData((prev) => ({
-            //   ...prev,
-            //   [type === 'resume' ? 'resumeUrl' : 'cvUrl']: data.url,
-            // }));
-            if (type === "resume") {
-              formData.resumeUrl = data?.url;
-            } else {
-              formData.cvUrl = data?.url;
-            }
-            resolve(data?.url);
-          })
-          .catch(reject);
+          );
+
+          if (!response.ok) throw new Error("Upload failed");
+          const data = await response.json();
+          setFormData((prev) => ({
+            ...prev,
+            [type === "resume" ? "resumeUrl" : "cvUrl"]: data.url,
+          }));
+          resolve(data.url);
+        } catch (error) {
+          reject(error);
+        }
       };
-
       reader.onerror = () => reject(new Error("File reading failed"));
     });
   };
 
   const handleSubmit = async () => {
-    console.log("Submit data", formData);
-    
     try {
-      let uploadPromises = [];
+      await validationSchema.validate(formData, { abortEarly: false });
+      setErrors({});
       setIsSubmitting(true);
-      if (formData.uploadResume) {
+
+      const uploadPromises = [];
+      if (formData.uploadResume)
         uploadPromises.push(handleFileUpload(formData.uploadResume, "resume"));
-      }
-      if (formData.uploadCV) {
+      if (formData.uploadCV)
         uploadPromises.push(handleFileUpload(formData.uploadCV, "cv"));
-      }
+      await Promise.all(uploadPromises);
 
-      // Execute all upload promises and then handle further logic
-      Promise.all(uploadPromises)
-        .then(() => {
-          let data = { ...formData }; // Create a copy of formData
-          data.uploadResume = null;
-          data.uploadCV = null;
+      const { uploadResume, uploadCV, ...submitData } = formData;
+      const result = await insertApplicationData(submitData, jobId);
 
-          console.log("data", data, formData);
-
-          // Insert application data
-          return insertApplicationData(data, jobId);
-        })
-        .then((result) => {
-          if (result.status) {
-            setIsModalOpen(true);
-            setFormData({
-              employerName: "",
-              phoneNumber: "",
-              experience: "",
-              startDate: "",
-              email: "",
-              employmentstatus: "",
-              linkedinProfile: "",
-              certification: "",
-              uploadResume: null,
-              uploadCV: null,
-              resumeUrl: "",
-              cvUrl: "",
-            });
-          }
-        })
-        .catch((error) => {
-          console.error("Error occurred:", error);
+      if (result.status) {
+        setIsModalOpen(true);
+        setFormData({
+          employerName: "",
+          phoneNumber: "",
+          experience: "",
+          startDate: "",
+          email: "",
+          employmentstatus: "",
+          linkedinProfile: "",
+          certification: "",
+          uploadResume: null,
+          uploadCV: null,
+          resumeUrl: "",
+          cvUrl: "",
         });
+      }
     } catch (error) {
-      console.error("Unexpected error:", error);
+      if (error instanceof Yup.ValidationError) {
+        // Create an object with all validation errors
+        const validationErrors = error.inner.reduce((acc, err) => {
+          if (err.path) {
+            acc[err.path] = err.message;
+          }
+          return acc;
+        }, {} as FormErrors);
+
+        setErrors(validationErrors);
+      }
+      setIsSubmitting(false);
     } finally {
-      // try {
-      //   let uploadPromises = [];
-
-      //   if (formData.uploadResume) {
-      //     uploadPromises.push(handleFileUpload(formData.uploadResume, 'resume'));
-      //   }
-      //   if (formData.uploadCV) {
-      //     uploadPromises.push(handleFileUpload(formData.uploadCV, 'cv'));
-      //   }
-
-      //   await Promise.all(uploadPromises);
-
-      //   // const result = await onSubmit({
-      //   //   ...formData,
-      //   //   jobId: jobId,
-      //   // });
-      //   let data=formData;
-      //   data.uploadResume=null;
-      //   data.uploadCV=null;
-      //   console.log("data",data,formData);
-      //   insertApplicationData(
-      //     data,jobId
-
-      //   )
-      //   .then((result) => {
-      //     if (result.status) {
-      //       router.push("/application-success");
-      //     }
-
-      //   })}
-      //  catch (error) {
-      //        console.error("Application submission failed:", error);
-      //      }
       setIsSubmitting(false);
     }
-
-    //   if (result.status) {
-    //     router.push("/application-success");
-    //   }
-    // } catch (error) {
-    //   console.error("Application submission failed:", error);
-    // } finally {
-    //   setIsSubmitting(false);
   };
 
   const startDateValue = formData.startDate
@@ -259,47 +206,6 @@ const ApplicantForm = ({ jobId }: ApplicantFormProps) => {
 
   return (
     <div>
-      <Modal
-        opened={isModalOpen}
-        centered
-        onClose={() => setIsModalOpen(false)}
-          size="md"
-      >
-          <Box ml={10} mr={10} mb={10}></Box>
-         <Title
-                        ta="left"
-                        style={{
-                        fontSize:20
-                      }}
-                        // order={1}
-                        // className={SFProRounded.className}
-                        c="blue"
-                        mb={10}
-                      >
-                        { "Success!"}
-                        {/* {searchParams?.message && searchParams.message == "Success" ? "Success!" : "Fail!"} */}
-                      </Title>
-        <Text>Form Submitted Successfully</Text>
-        
-        <Group justify="flex-end">
-        <Button  style={{
-           backgroundColor: "#004a93",
-           color: "white",
-           alignItems: "right",
-           // padding: "10px",
-           borderRadius: "20px",
-           height: "40px",
-           fontSize: "16px",
-           fontWeight: 500,
-           border: "none",
-           cursor: "pointer",
-           transition: "background-color 0.3s",
-        }}
-        onClick={closeModal}>
-          Close
-        </Button>
-        </Group>
-      </Modal>
       <Box
         mx="auto"
         p="lg"
@@ -308,6 +214,31 @@ const ApplicantForm = ({ jobId }: ApplicantFormProps) => {
           backgroundColor: "white",
         }}
       >
+        <Modal
+          opened={isModalOpen}
+          centered
+          onClose={() => setIsModalOpen(false)}
+          size="lg"
+        >
+          <Text
+            size="md"
+            style={{
+              marginBottom: "25px",
+            }}
+            className={SFProRounded.className}
+          >
+            Your application has been submitted successfully
+          </Text>
+          <Group mt="md" justify="flex-end">
+            <Button
+              color="#004A93"
+              aria-label="Delete draft"
+              onClick={closeModal}
+            >
+              Close
+            </Button>
+          </Group>
+        </Modal>
         <form>
           <Grid
             gutter={34}
@@ -540,7 +471,6 @@ const ApplicantForm = ({ jobId }: ApplicantFormProps) => {
           </Grid>
         </form>
       </Box>
-
       <Group
         mt="lg"
         style={{
