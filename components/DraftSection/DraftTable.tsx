@@ -163,6 +163,7 @@ const DraftTable = ({ showPagination, pagename }: Props) => {
             color: "#718096",
             fontWeight: 500,
             fontSize: "16px",
+            whiteSpace: "nowrap",
           }}
         >
           {/* {index + 1} */}
@@ -175,6 +176,7 @@ const DraftTable = ({ showPagination, pagename }: Props) => {
               flexDirection: "column",
               alignItems: "center",
               justifyContent: "center",
+              whiteSpace: "nowrap",
             }}
           >
             <div
@@ -221,6 +223,7 @@ const DraftTable = ({ showPagination, pagename }: Props) => {
             color: "#718096",
             fontWeight: 500,
             fontSize: "16px",
+            whiteSpace: "nowrap",
           }}
         >
           {job.created_at
@@ -231,7 +234,7 @@ const DraftTable = ({ showPagination, pagename }: Props) => {
               })
             : "-"}
         </Table.Td>
-        <Table.Td style={{ textAlign: "center" }}>
+        <Table.Td style={{ textAlign: "center", whiteSpace: "nowrap" }}>
           <div
             style={{
               display: "flex",
@@ -401,9 +404,13 @@ const DraftTable = ({ showPagination, pagename }: Props) => {
         centered
         size="lg"
       >
-        <Text size="md" style={{
-          marginBottom: "25px",
-        }} className={SFProRounded.className}>
+        <Text
+          size="md"
+          style={{
+            marginBottom: "25px",
+          }}
+          className={SFProRounded.className}
+        >
           This action will permanently delete your draft. Are you sure you want
           to continue ?
         </Text>

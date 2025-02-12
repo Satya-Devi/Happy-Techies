@@ -217,10 +217,11 @@ const MyJobs = ({ showPagination, pagename }: Props) => {
             color: "#718096",
             fontWeight: 500,
             fontSize: "16px",
+            whiteSpace: "nowrap",
           }}
         >
           {/* {index + 1} */}
-          {((activePage - 1) * data.length) + (index + 1)}
+          {(activePage - 1) * data.length + (index + 1)}
         </Table.Td>
         <Table.Td>
           <div
@@ -229,6 +230,7 @@ const MyJobs = ({ showPagination, pagename }: Props) => {
               flexDirection: "column",
               alignItems: "center",
               justifyContent: "center",
+              whiteSpace: "nowrap",
             }}
           >
             <div
@@ -281,6 +283,7 @@ const MyJobs = ({ showPagination, pagename }: Props) => {
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
+              whiteSpace: "nowrap",
               gap: "3px",
               color: renderStatus(job.application_deadline, job.job_status)
                 .color,
@@ -295,6 +298,7 @@ const MyJobs = ({ showPagination, pagename }: Props) => {
             textAlign: "center",
             color: "#718096",
             fontWeight: 500,
+            whiteSpace: "nowrap",
             fontSize: "16px",
           }}
         >
@@ -306,6 +310,7 @@ const MyJobs = ({ showPagination, pagename }: Props) => {
             color: "#718096",
             fontWeight: 500,
             fontSize: "16px",
+            whiteSpace: "nowrap",
           }}
         >
           {/* {new Date(job.created_at).toLocaleDateString("en-GB", {
@@ -325,6 +330,7 @@ const MyJobs = ({ showPagination, pagename }: Props) => {
             textAlign: "center",
             color: "#718096",
             fontWeight: 500,
+            whiteSpace: "nowrap",
             fontSize: "16px",
           }}
         >
@@ -341,95 +347,114 @@ const MyJobs = ({ showPagination, pagename }: Props) => {
             : "-"}
         </Table.Td>
 
-        <Table.Td style={{ textAlign: "center" }}>
+        <Table.Td
+          style={{
+            textAlign: "center",
+            whiteSpace: "nowrap",
+          }}
+        >
           <div
             style={{
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              gap: "7px",
-              color: "#718096",
             }}
           >
-            <div>
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 20 20"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M1 19V17C1 15.9391 1.42143 14.9217 2.17157 14.1716C2.92172 13.4214 3.93913 13 5 13H9C10.0609 13 11.0783 13.4214 11.8284 14.1716C12.5786 14.9217 13 15.9391 13 17V19M14 1.12988C14.8604 1.35018 15.623 1.85058 16.1676 2.55219C16.7122 3.2538 17.0078 4.11671 17.0078 5.00488C17.0078 5.89305 16.7122 6.75596 16.1676 7.45757C15.623 8.15918 14.8604 8.65958 14 8.87988M19 18.9999V16.9999C18.9949 16.1171 18.6979 15.2607 18.1553 14.5643C17.6126 13.8679 16.8548 13.3706 16 13.1499M3 5C3 6.06087 3.42143 7.07828 4.17157 7.82843C4.92172 8.57857 5.93913 9 7 9C8.06087 9 9.07828 8.57857 9.82843 7.82843C10.5786 7.07828 11 6.06087 11 5C11 3.93913 10.5786 2.92172 9.82843 2.17157C9.07828 1.42143 8.06087 1 7 1C5.93913 1 4.92172 1.42143 4.17157 2.17157C3.42143 2.92172 3 3.93913 3 5Z"
-                  stroke="black"
-                  stroke-opacity="0.4"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-              </svg>
-            </div>
             <div
-              style={{ fontWeight: 500, fontSize: "16px", cursor: "pointer" }}
-              onClick={() => router.push(`/applicants-preview?id=${job.id}`)}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "7px",
+                color: "#718096",
+              }}
             >
-              {" "}
-              {job?.applicants_count ? job?.applicants_count:0 } Applicants
-            </div>
-            <div>
-              <Button
-                size="xs"
-                style={{
-                  backgroundColor: "#DDF0FD",
-                  color: "#004A93",
-                  margin: "0 auto",
-                  display: "block",
-                }}
+              <div>
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 20 20"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M1 19V17C1 15.9391 1.42143 14.9217 2.17157 14.1716C2.92172 13.4214 3.93913 13 5 13H9C10.0609 13 11.0783 13.4214 11.8284 14.1716C12.5786 14.9217 13 15.9391 13 17V19M14 1.12988C14.8604 1.35018 15.623 1.85058 16.1676 2.55219C16.7122 3.2538 17.0078 4.11671 17.0078 5.00488C17.0078 5.89305 16.7122 6.75596 16.1676 7.45757C15.623 8.15918 14.8604 8.65958 14 8.87988M19 18.9999V16.9999C18.9949 16.1171 18.6979 15.2607 18.1553 14.5643C17.6126 13.8679 16.8548 13.3706 16 13.1499M3 5C3 6.06087 3.42143 7.07828 4.17157 7.82843C4.92172 8.57857 5.93913 9 7 9C8.06087 9 9.07828 8.57857 9.82843 7.82843C10.5786 7.07828 11 6.06087 11 5C11 3.93913 10.5786 2.92172 9.82843 2.17157C9.07828 1.42143 8.06087 1 7 1C5.93913 1 4.92172 1.42143 4.17157 2.17157C3.42143 2.92172 3 3.93913 3 5Z"
+                    stroke="black"
+                    stroke-opacity="0.4"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </div>
+              <div
+                style={{ fontWeight: 500, fontSize: "16px", cursor: "pointer" }}
                 onClick={() => router.push(`/applicants-preview?id=${job.id}`)}
               >
-                View
-              </Button>
+                {" "}
+                {job?.applicants_count ? job?.applicants_count : 0} Applicants
+              </div>
             </div>
+
+            <Button
+              size="xs"
+              style={{
+                backgroundColor: "#DDF0FD",
+                color: "#004A93",
+                margin: "0 auto",
+                display: "block",
+              }}
+              onClick={() => router.push(`/applicants-preview?id=${job.id}`)}
+            >
+              View
+            </Button>
           </div>
         </Table.Td>
-        <Table.Td
-          style={{ textAlign: "center" }}
-          // onClick={() => redirectToEditJob(job.id)}
-        >
+        <Table.Td style={{ textAlign: "center", whiteSpace: "nowrap" }}>
           <Menu withArrow>
             <Menu.Target>
-              <svg
-                width="4"
-                height="18"
-                viewBox="0 0 4 18"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
+              <Button
+                variant="subtle"
+                p={10}
+                style={{
+                  cursor: "pointer",
+                  background: "transparent",
+                  border: "none",
+                }}
               >
-                <path
-                  d="M1 9C1 9.26522 1.10536 9.51957 1.29289 9.70711C1.48043 9.89464 1.73478 10 2 10C2.26522 10 2.51957 9.89464 2.70711 9.70711C2.89464 9.51957 3 9.26522 3 9C3 8.73478 2.89464 8.48043 2.70711 8.29289C2.51957 8.10536 2.26522 8 2 8C1.73478 8 1.48043 8.10536 1.29289 8.29289C1.10536 8.48043 1 8.73478 1 9Z"
-                  stroke="black"
-                  strokeOpacity="0.4"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-                <path
-                  d="M1 16C1 16.2652 1.10536 16.5196 1.29289 16.7071C1.48043 16.8946 1.73478 17 2 17C2.26522 17 2.51957 16.8946 2.70711 16.7071C2.89464 16.5196 3 16.2652 3 16C3 15.7348 2.89464 15.4804 2.70711 15.2929C2.51957 15.1054 2.26522 15 2 15C1.73478 15 1.48043 15.1054 1.29289 15.2929C1.10536 15.4804 1 15.7348 1 16Z"
-                  stroke="black"
-                  strokeOpacity="0.4"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-                <path
-                  d="M1 2C1 2.26522 1.10536 2.51957 1.29289 2.70711C1.48043 2.89464 1.73478 3 2 3C2.26522 3 2.51957 2.89464 2.70711 2.70711C2.89464 2.51957 3 2.26522 3 2C3 1.73478 2.89464 1.48043 2.70711 1.29289C2.51957 1.10536 2.26522 1 2 1C1.73478 1 1.48043 1.10536 1.29289 1.29289C1.10536 1.48043 1 1.73478 1 2Z"
-                  stroke="black"
-                  strokeOpacity="0.4"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
+                <svg
+                  width="4"
+                  height="18"
+                  viewBox="0 0 4 18"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M1 9C1 9.26522 1.10536 9.51957 1.29289 9.70711C1.48043 9.89464 1.73478 10 2 10C2.26522 10 2.51957 9.89464 2.70711 9.70711C2.89464 9.51957 3 9.26522 3 9C3 8.73478 2.89464 8.48043 2.70711 8.29289C2.51957 8.10536 2.26522 8 2 8C1.73478 8 1.48043 8.10536 1.29289 8.29289C1.10536 8.48043 1 8.73478 1 9Z"
+                    stroke="black"
+                    strokeOpacity="0.4"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M1 16C1 16.2652 1.10536 16.5196 1.29289 16.7071C1.48043 16.8946 1.73478 17 2 17C2.26522 17 2.51957 16.8946 2.70711 16.7071C2.89464 16.5196 3 16.2652 3 16C3 15.7348 2.89464 15.4804 2.70711 15.2929C2.51957 15.1054 2.26522 15 2 15C1.73478 15 1.48043 15.1054 1.29289 15.2929C1.10536 15.4804 1 15.7348 1 16Z"
+                    stroke="black"
+                    strokeOpacity="0.4"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M1 2C1 2.26522 1.10536 2.51957 1.29289 2.70711C1.48043 2.89464 1.73478 3 2 3C2.26522 3 2.51957 2.89464 2.70711 2.70711C2.89464 2.51957 3 2.26522 3 2C3 1.73478 2.89464 1.48043 2.70711 1.29289C2.51957 1.10536 2.26522 1 2 1C1.73478 1 1.48043 1.10536 1.29289 1.29289C1.10536 1.48043 1 1.73478 1 2Z"
+                    stroke="black"
+                    strokeOpacity="0.4"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </Button>
             </Menu.Target>
             <Menu.Dropdown
               style={{
@@ -537,16 +562,13 @@ const MyJobs = ({ showPagination, pagename }: Props) => {
               display: "flex",
               justifyContent: "center",
               alignItems: "center",
-              minHeight: "50vh", // This ensures vertical centering
+              minHeight: "50vh",
               width: "100%",
             }}
           >
             <Loading />
           </div>
-        ) : // In the render section:
-        //  <Loading />  // rest of the code
-
-        data.length === 0 ? (
+        ) : data.length === 0 ? (
           <div
             style={{
               textAlign: "center",

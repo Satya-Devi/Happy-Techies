@@ -371,7 +371,7 @@ const Applicants = ({ data }: ApplicantsProps) => {
           : undefined
       }
     >
-      <Table.Td>
+      <Table.Td style={{ whiteSpace: "nowrap" }}>
         <Checkbox
           aria-label="Select row"
           checked={selectedRows.includes(applicant.id)}
@@ -385,9 +385,11 @@ const Applicants = ({ data }: ApplicantsProps) => {
           }}
         />
       </Table.Td>
-      <Table.Td>
+      <Table.Td style={{ whiteSpace: "nowrap" }}>
         <Group>
-          <Avatar size={40} radius={40} />
+          <Box visibleFrom="md">
+            <Avatar size={40} radius={40} />
+          </Box>
           <div>
             <Text fw={500}>{applicant.full_name}</Text>
             <Text size="sm" c="#718096">
@@ -396,10 +398,10 @@ const Applicants = ({ data }: ApplicantsProps) => {
           </div>
         </Group>
       </Table.Td>
-      <Table.Td>
+      <Table.Td style={{ whiteSpace: "nowrap" }}>
         <Text c="#718096">{applicant.experience} yrs </Text>
       </Table.Td>
-      <Table.Td>
+      <Table.Td style={{ whiteSpace: "nowrap" }}>
         <Text c="#718096">
           {applicant.created_at
             ? new Date(applicant.created_at).toLocaleDateString("en-GB", {
@@ -410,42 +412,52 @@ const Applicants = ({ data }: ApplicantsProps) => {
             : "-"}
         </Text>
       </Table.Td>
-      <Table.Td>
+      <Table.Td style={{ whiteSpace: "nowrap" }}>
         {" "}
         <Menu withArrow>
           <Menu.Target>
-            <svg
-              width="4"
-              height="18"
-              viewBox="0 0 4 18"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
+            <Button
+              variant="subtle"
+              p={10}
+              style={{
+                cursor: "pointer",
+                background: "transparent",
+                border: "none",
+              }}
             >
-              <path
-                d="M1 9C1 9.26522 1.10536 9.51957 1.29289 9.70711C1.48043 9.89464 1.73478 10 2 10C2.26522 10 2.51957 9.89464 2.70711 9.70711C2.89464 9.51957 3 9.26522 3 9C3 8.73478 2.89464 8.48043 2.70711 8.29289C2.51957 8.10536 2.26522 8 2 8C1.73478 8 1.48043 8.10536 1.29289 8.29289C1.10536 8.48043 1 8.73478 1 9Z"
-                stroke="black"
-                strokeOpacity="0.4"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M1 16C1 16.2652 1.10536 16.5196 1.29289 16.7071C1.48043 16.8946 1.73478 17 2 17C2.26522 17 2.51957 16.8946 2.70711 16.7071C2.89464 16.5196 3 16.2652 3 16C3 15.7348 2.89464 15.4804 2.70711 15.2929C2.51957 15.1054 2.26522 15 2 15C1.73478 15 1.48043 15.1054 1.29289 15.2929C1.10536 15.4804 1 15.7348 1 16Z"
-                stroke="black"
-                strokeOpacity="0.4"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M1 2C1 2.26522 1.10536 2.51957 1.29289 2.70711C1.48043 2.89464 1.73478 3 2 3C2.26522 3 2.51957 2.89464 2.70711 2.70711C2.89464 2.51957 3 2.26522 3 2C3 1.73478 2.89464 1.48043 2.70711 1.29289C2.51957 1.10536 2.26522 1 2 1C1.73478 1 1.48043 1.10536 1.29289 1.29289C1.10536 1.48043 1 1.73478 1 2Z"
-                stroke="black"
-                strokeOpacity="0.4"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
+              <svg
+                width="4"
+                height="18"
+                viewBox="0 0 4 18"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M1 9C1 9.26522 1.10536 9.51957 1.29289 9.70711C1.48043 9.89464 1.73478 10 2 10C2.26522 10 2.51957 9.89464 2.70711 9.70711C2.89464 9.51957 3 9.26522 3 9C3 8.73478 2.89464 8.48043 2.70711 8.29289C2.51957 8.10536 2.26522 8 2 8C1.73478 8 1.48043 8.10536 1.29289 8.29289C1.10536 8.48043 1 8.73478 1 9Z"
+                  stroke="black"
+                  strokeOpacity="0.4"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M1 16C1 16.2652 1.10536 16.5196 1.29289 16.7071C1.48043 16.8946 1.73478 17 2 17C2.26522 17 2.51957 16.8946 2.70711 16.7071C2.89464 16.5196 3 16.2652 3 16C3 15.7348 2.89464 15.4804 2.70711 15.2929C2.51957 15.1054 2.26522 15 2 15C1.73478 15 1.48043 15.1054 1.29289 15.2929C1.10536 15.4804 1 15.7348 1 16Z"
+                  stroke="black"
+                  strokeOpacity="0.4"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M1 2C1 2.26522 1.10536 2.51957 1.29289 2.70711C1.48043 2.89464 1.73478 3 2 3C2.26522 3 2.51957 2.89464 2.70711 2.70711C2.89464 2.51957 3 2.26522 3 2C3 1.73478 2.89464 1.48043 2.70711 1.29289C2.51957 1.10536 2.26522 1 2 1C1.73478 1 1.48043 1.10536 1.29289 1.29289C1.10536 1.48043 1 1.73478 1 2Z"
+                  stroke="black"
+                  strokeOpacity="0.4"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </Button>
           </Menu.Target>
           <Menu.Dropdown
             style={{
@@ -504,7 +516,7 @@ const Applicants = ({ data }: ApplicantsProps) => {
           : undefined
       }
     >
-      <Table.Td>
+      <Table.Td style={{ whiteSpace: "nowrap" }}>
         <Checkbox
           aria-label="Select row"
           checked={selectedRows.includes(applicant.id)}
@@ -518,9 +530,11 @@ const Applicants = ({ data }: ApplicantsProps) => {
           }}
         />
       </Table.Td>
-      <Table.Td>
+      <Table.Td style={{ whiteSpace: "nowrap" }}>
         <Group>
-          <Avatar size={40} radius={40} />
+          <Box visibleFrom="md">
+            <Avatar size={40} radius={40} />
+          </Box>
           <div>
             <Text fw={500}>{applicant.full_name}</Text>
             <Text size="sm" c="#718096">
@@ -529,10 +543,10 @@ const Applicants = ({ data }: ApplicantsProps) => {
           </div>
         </Group>
       </Table.Td>
-      <Table.Td>
+      <Table.Td style={{ whiteSpace: "nowrap" }}>
         <Text c="#718096">{applicant.experience} yrs </Text>
       </Table.Td>
-      <Table.Td>
+      <Table.Td style={{ whiteSpace: "nowrap" }}>
         <Text c="#718096">
           {applicant.created_at
             ? new Date(applicant.created_at).toLocaleDateString("en-GB", {
@@ -543,40 +557,50 @@ const Applicants = ({ data }: ApplicantsProps) => {
             : "-"}
         </Text>
       </Table.Td>
-      <Table.Td>
+      <Table.Td style={{ whiteSpace: "nowrap" }}>
         {" "}
-        <svg
-          width="4"
-          height="18"
-          viewBox="0 0 4 18"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
+        <Button
+          variant="subtle"
+          p={10}
+          style={{
+            cursor: "pointer",
+            background: "transparent",
+            border: "none",
+          }}
         >
-          <path
-            d="M1 9C1 9.26522 1.10536 9.51957 1.29289 9.70711C1.48043 9.89464 1.73478 10 2 10C2.26522 10 2.51957 9.89464 2.70711 9.70711C2.89464 9.51957 3 9.26522 3 9C3 8.73478 2.89464 8.48043 2.70711 8.29289C2.51957 8.10536 2.26522 8 2 8C1.73478 8 1.48043 8.10536 1.29289 8.29289C1.10536 8.48043 1 8.73478 1 9Z"
-            stroke="black"
-            strokeOpacity="0.4"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-          <path
-            d="M1 16C1 16.2652 1.10536 16.5196 1.29289 16.7071C1.48043 16.8946 1.73478 17 2 17C2.26522 17 2.51957 16.8946 2.70711 16.7071C2.89464 16.5196 3 16.2652 3 16C3 15.7348 2.89464 15.4804 2.70711 15.2929C2.51957 15.1054 2.26522 15 2 15C1.73478 15 1.48043 15.1054 1.29289 15.2929C1.10536 15.4804 1 15.7348 1 16Z"
-            stroke="black"
-            strokeOpacity="0.4"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-          <path
-            d="M1 2C1 2.26522 1.10536 2.51957 1.29289 2.70711C1.48043 2.89464 1.73478 3 2 3C2.26522 3 2.51957 2.89464 2.70711 2.70711C2.89464 2.51957 3 2.26522 3 2C3 1.73478 2.89464 1.48043 2.70711 1.29289C2.51957 1.10536 2.26522 1 2 1C1.73478 1 1.48043 1.10536 1.29289 1.29289C1.10536 1.48043 1 1.73478 1 2Z"
-            stroke="black"
-            strokeOpacity="0.4"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
+          <svg
+            width="4"
+            height="18"
+            viewBox="0 0 4 18"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M1 9C1 9.26522 1.10536 9.51957 1.29289 9.70711C1.48043 9.89464 1.73478 10 2 10C2.26522 10 2.51957 9.89464 2.70711 9.70711C2.89464 9.51957 3 9.26522 3 9C3 8.73478 2.89464 8.48043 2.70711 8.29289C2.51957 8.10536 2.26522 8 2 8C1.73478 8 1.48043 8.10536 1.29289 8.29289C1.10536 8.48043 1 8.73478 1 9Z"
+              stroke="black"
+              strokeOpacity="0.4"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <path
+              d="M1 16C1 16.2652 1.10536 16.5196 1.29289 16.7071C1.48043 16.8946 1.73478 17 2 17C2.26522 17 2.51957 16.8946 2.70711 16.7071C2.89464 16.5196 3 16.2652 3 16C3 15.7348 2.89464 15.4804 2.70711 15.2929C2.51957 15.1054 2.26522 15 2 15C1.73478 15 1.48043 15.1054 1.29289 15.2929C1.10536 15.4804 1 15.7348 1 16Z"
+              stroke="black"
+              strokeOpacity="0.4"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <path
+              d="M1 2C1 2.26522 1.10536 2.51957 1.29289 2.70711C1.48043 2.89464 1.73478 3 2 3C2.26522 3 2.51957 2.89464 2.70711 2.70711C2.89464 2.51957 3 2.26522 3 2C3 1.73478 2.89464 1.48043 2.70711 1.29289C2.51957 1.10536 2.26522 1 2 1C1.73478 1 1.48043 1.10536 1.29289 1.29289C1.10536 1.48043 1 1.73478 1 2Z"
+              stroke="black"
+              strokeOpacity="0.4"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </Button>
       </Table.Td>
     </Table.Tr>
   ));
@@ -755,6 +779,7 @@ const Applicants = ({ data }: ApplicantsProps) => {
                     flexDirection: "column",
                     alignItems: "center",
                     justifyContent: "center",
+                    whiteSpace: "nowrap",
                   }}
                 >
                   <div
@@ -805,7 +830,7 @@ const Applicants = ({ data }: ApplicantsProps) => {
                   </div>
                 </div>
               </Table.Td>
-              <Table.Td style={{ textAlign: "center" }}>
+              <Table.Td style={{ textAlign: "center", whiteSpace: "nowrap" }}>
                 <div
                   style={{
                     display: "flex",
@@ -825,6 +850,7 @@ const Applicants = ({ data }: ApplicantsProps) => {
                   color: "#718096",
                   fontWeight: 500,
                   fontSize: "16px",
+                  whiteSpace: "nowrap",
                 }}
               >
                 {data.solution_area || "-"}
@@ -835,6 +861,7 @@ const Applicants = ({ data }: ApplicantsProps) => {
                   color: "#718096",
                   fontWeight: 500,
                   fontSize: "16px",
+                  whiteSpace: "nowrap",
                 }}
               >
                 {/* {new Date(job.created_at).toLocaleDateString("en-GB", {
@@ -854,6 +881,7 @@ const Applicants = ({ data }: ApplicantsProps) => {
                   color: "#718096",
                   fontWeight: 500,
                   fontSize: "16px",
+                  whiteSpace: "nowrap",
                 }}
               >
                 {/* {new Date(job.application_deadline).toLocaleDateString("en-GB", {
@@ -870,100 +898,116 @@ const Applicants = ({ data }: ApplicantsProps) => {
                     )
                   : "-"}
               </Table.Td>
-              <Table.Td style={{ textAlign: "center" }}>
+              <Table.Td style={{ textAlign: "center", whiteSpace: "nowrap" }}>
                 <div
                   style={{
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    gap: "7px",
-                    color: "#718096",
                   }}
                 >
-                  <div>
-                    <svg
-                      width="16"
-                      height="16"
-                      viewBox="0 0 20 20"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M1 19V17C1 15.9391 1.42143 14.9217 2.17157 14.1716C2.92172 13.4214 3.93913 13 5 13H9C10.0609 13 11.0783 13.4214 11.8284 14.1716C12.5786 14.9217 13 15.9391 13 17V19M14 1.12988C14.8604 1.35018 15.623 1.85058 16.1676 2.55219C16.7122 3.2538 17.0078 4.11671 17.0078 5.00488C17.0078 5.89305 16.7122 6.75596 16.1676 7.45757C15.623 8.15918 14.8604 8.65958 14 8.87988M19 18.9999V16.9999C18.9949 16.1171 18.6979 15.2607 18.1553 14.5643C17.6126 13.8679 16.8548 13.3706 16 13.1499M3 5C3 6.06087 3.42143 7.07828 4.17157 7.82843C4.92172 8.57857 5.93913 9 7 9C8.06087 9 9.07828 8.57857 9.82843 7.82843C10.5786 7.07828 11 6.06087 11 5C11 3.93913 10.5786 2.92172 9.82843 2.17157C9.07828 1.42143 8.06087 1 7 1C5.93913 1 4.92172 1.42143 4.17157 2.17157C3.42143 2.92172 3 3.93913 3 5Z"
-                        stroke="black"
-                        stroke-opacity="0.4"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      />
-                    </svg>
-                  </div>
                   <div
                     style={{
-                      fontWeight: 500,
-                      fontSize: "16px",
-                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: "7px",
+                      color: "#718096",
                     }}
-                    onClick={() =>
-                      router.push(`/applicants-preview?id=${data.id}`)
-                    }
                   >
-                    0 Applicants
-                  </div>
-                  <div>
-                    <Button
-                      size="xs"
+                    <div>
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 20 20"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M1 19V17C1 15.9391 1.42143 14.9217 2.17157 14.1716C2.92172 13.4214 3.93913 13 5 13H9C10.0609 13 11.0783 13.4214 11.8284 14.1716C12.5786 14.9217 13 15.9391 13 17V19M14 1.12988C14.8604 1.35018 15.623 1.85058 16.1676 2.55219C16.7122 3.2538 17.0078 4.11671 17.0078 5.00488C17.0078 5.89305 16.7122 6.75596 16.1676 7.45757C15.623 8.15918 14.8604 8.65958 14 8.87988M19 18.9999V16.9999C18.9949 16.1171 18.6979 15.2607 18.1553 14.5643C17.6126 13.8679 16.8548 13.3706 16 13.1499M3 5C3 6.06087 3.42143 7.07828 4.17157 7.82843C4.92172 8.57857 5.93913 9 7 9C8.06087 9 9.07828 8.57857 9.82843 7.82843C10.5786 7.07828 11 6.06087 11 5C11 3.93913 10.5786 2.92172 9.82843 2.17157C9.07828 1.42143 8.06087 1 7 1C5.93913 1 4.92172 1.42143 4.17157 2.17157C3.42143 2.92172 3 3.93913 3 5Z"
+                          stroke="black"
+                          stroke-opacity="0.4"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                      </svg>
+                    </div>
+                    <div
                       style={{
-                        backgroundColor: "#DDF0FD",
-                        color: "#004A93",
-                        margin: "0 auto",
-                        display: "block",
+                        fontWeight: 500,
+                        fontSize: "16px",
+                        cursor: "pointer",
                       }}
-                      onClick={() => router.push(`/job-preview?id=${data.id}`)}
+                      onClick={() =>
+                        router.push(`/applicants-preview?id=${data.id}`)
+                      }
                     >
-                      View
-                    </Button>
+                      0 Applicants
+                    </div>
                   </div>
+                  <Button
+                    size="xs"
+                    style={{
+                      backgroundColor: "#DDF0FD",
+                      color: "#004A93",
+                      margin: "0 auto",
+                      display: "block",
+                    }}
+                    onClick={() => router.push(`/job-preview?id=${data.id}`)}
+                  >
+                    View
+                  </Button>
                 </div>
               </Table.Td>
               <Table.Td
-                style={{ textAlign: "center" }}
+                style={{ textAlign: "center", whiteSpace: "nowrap" }}
                 // onClick={() => redirectToEditJob(job.id)}
               >
                 <Menu withArrow>
                   <Menu.Target>
-                    <svg
-                      width="4"
-                      height="18"
-                      viewBox="0 0 4 18"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
+                    <Button
+                      variant="subtle"
+                      p={10}
+                      style={{
+                        cursor: "pointer",
+                        background: "transparent",
+                        border: "none",
+                      }}
                     >
-                      <path
-                        d="M1 9C1 9.26522 1.10536 9.51957 1.29289 9.70711C1.48043 9.89464 1.73478 10 2 10C2.26522 10 2.51957 9.89464 2.70711 9.70711C2.89464 9.51957 3 9.26522 3 9C3 8.73478 2.89464 8.48043 2.70711 8.29289C2.51957 8.10536 2.26522 8 2 8C1.73478 8 1.48043 8.10536 1.29289 8.29289C1.10536 8.48043 1 8.73478 1 9Z"
-                        stroke="black"
-                        strokeOpacity="0.4"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                      <path
-                        d="M1 16C1 16.2652 1.10536 16.5196 1.29289 16.7071C1.48043 16.8946 1.73478 17 2 17C2.26522 17 2.51957 16.8946 2.70711 16.7071C2.89464 16.5196 3 16.2652 3 16C3 15.7348 2.89464 15.4804 2.70711 15.2929C2.51957 15.1054 2.26522 15 2 15C1.73478 15 1.48043 15.1054 1.29289 15.2929C1.10536 15.4804 1 15.7348 1 16Z"
-                        stroke="black"
-                        strokeOpacity="0.4"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                      <path
-                        d="M1 2C1 2.26522 1.10536 2.51957 1.29289 2.70711C1.48043 2.89464 1.73478 3 2 3C2.26522 3 2.51957 2.89464 2.70711 2.70711C2.89464 2.51957 3 2.26522 3 2C3 1.73478 2.89464 1.48043 2.70711 1.29289C2.51957 1.10536 2.26522 1 2 1C1.73478 1 1.48043 1.10536 1.29289 1.29289C1.10536 1.48043 1 1.73478 1 2Z"
-                        stroke="black"
-                        strokeOpacity="0.4"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
+                      <svg
+                        width="4"
+                        height="18"
+                        viewBox="0 0 4 18"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M1 9C1 9.26522 1.10536 9.51957 1.29289 9.70711C1.48043 9.89464 1.73478 10 2 10C2.26522 10 2.51957 9.89464 2.70711 9.70711C2.89464 9.51957 3 9.26522 3 9C3 8.73478 2.89464 8.48043 2.70711 8.29289C2.51957 8.10536 2.26522 8 2 8C1.73478 8 1.48043 8.10536 1.29289 8.29289C1.10536 8.48043 1 8.73478 1 9Z"
+                          stroke="black"
+                          strokeOpacity="0.4"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                        <path
+                          d="M1 16C1 16.2652 1.10536 16.5196 1.29289 16.7071C1.48043 16.8946 1.73478 17 2 17C2.26522 17 2.51957 16.8946 2.70711 16.7071C2.89464 16.5196 3 16.2652 3 16C3 15.7348 2.89464 15.4804 2.70711 15.2929C2.51957 15.1054 2.26522 15 2 15C1.73478 15 1.48043 15.1054 1.29289 15.2929C1.10536 15.4804 1 15.7348 1 16Z"
+                          stroke="black"
+                          strokeOpacity="0.4"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                        <path
+                          d="M1 2C1 2.26522 1.10536 2.51957 1.29289 2.70711C1.48043 2.89464 1.73478 3 2 3C2.26522 3 2.51957 2.89464 2.70711 2.70711C2.89464 2.51957 3 2.26522 3 2C3 1.73478 2.89464 1.48043 2.70711 1.29289C2.51957 1.10536 2.26522 1 2 1C1.73478 1 1.48043 1.10536 1.29289 1.29289C1.10536 1.48043 1 1.73478 1 2Z"
+                          stroke="black"
+                          strokeOpacity="0.4"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    </Button>
                   </Menu.Target>
                   <Menu.Dropdown
                     style={{
@@ -1036,123 +1080,115 @@ const Applicants = ({ data }: ApplicantsProps) => {
           padding: "10px",
           borderRadius: "8px",
           marginTop: "15px",
+          overflowX: "auto",
         }}
+        className="scrollbar_hidden"
       >
-        <Group>
-          {/* Primary Buttons */}
-          {/* <Button
-            color="blue"
-            variant="filled"
-            radius="xl"
-            onClick={() => getData(1)}
-          >
-            All Applicants
-          </Button>
-          <Button
-            color="#004A93"
-            variant="outline"
-            radius="xl"
-            onClick={() => savedData(1)}
-          >
-            Saved Candidates
-          </Button>
-          <Button
-            color="#004A93"
-            variant="outline"
-            radius="xl"
-            onClick={() => getArchivedData(1)}
-          >
-            Archived Candidates
-          </Button> */}
+        <Group
+          wrap="nowrap"
+          style={{
+            minWidth: "max-content",
+          }}
+        >
+          {/* Primary Action Buttons */}
+          <Group wrap="wrap" gap="xs">
+            <Button
+              size="sm"
+              color={activeTab === "all" ? "blue" : "#004A93"}
+              variant={activeTab === "all" ? "filled" : "outline"}
+              radius="xl"
+              onClick={() => {
+                setActiveTab("all");
+                getData(1);
+              }}
+            >
+              All Applicants
+            </Button>
 
-          <Button
-            color={activeTab === "all" ? "blue" : "#004A93"}
-            variant={activeTab === "all" ? "filled" : "outline"}
-            radius="xl"
-            onClick={() => {
-              setActiveTab("all");
-              getData(1);
-            }}
-          >
-            All Applicants
-          </Button>
-          <Button
-            color={activeTab === "saved" ? "blue" : "#004A93"}
-            variant={activeTab === "saved" ? "filled" : "outline"}
-            radius="xl"
-            onClick={() => {
-              setActiveTab("saved");
-              savedData(1);
-            }}
-          >
-            Saved Candidates
-          </Button>
-          <Button
-            color={activeTab === "archived" ? "blue" : "#004A93"}
-            variant={activeTab === "archived" ? "filled" : "outline"}
-            radius="xl"
-            onClick={() => {
-              setActiveTab("archived");
-              getArchivedData(1);
-            }}
-          >
-            Archived Candidates
-          </Button>
+            <Button
+              size="sm"
+              color={activeTab === "saved" ? "blue" : "#004A93"}
+              variant={activeTab === "saved" ? "filled" : "outline"}
+              radius="xl"
+              onClick={() => {
+                setActiveTab("saved");
+                savedData(1);
+              }}
+            >
+              Saved Candidates
+            </Button>
 
-          {/* Spacer */}
+            <Button
+              size="sm"
+              color={activeTab === "archived" ? "blue" : "#004A93"}
+              variant={activeTab === "archived" ? "filled" : "outline"}
+              radius="xl"
+              onClick={() => {
+                setActiveTab("archived");
+                getArchivedData(1);
+              }}
+            >
+              Archived Candidates
+            </Button>
+          </Group>
+
           <div style={{ flexGrow: 1 }} />
 
-          {/* Secondary Buttons */}
-          <Button
-            color="#004A93"
-            variant="filled"
-            radius="md"
-            onClick={handleSelectAll}
-          >
-            {selectedRows.length === applicantData.length
-              ? "Deselect All"
-              : "Select All"}
-          </Button>
-
-          {/* Action Icons */}
-          <Tooltip label="Bookmark" withArrow>
-            <ActionIcon
-              color="#718096"
-              variant="transparent"
-              onClick={handleSavedApplicants}
+          {/* Action Buttons Group */}
+          <Group gap="xs" wrap="nowrap">
+            <Button
+              size="sm"
+              color="#004A93"
+              variant="filled"
+              radius="md"
+              onClick={handleSelectAll}
             >
-              <IconBookmark size={20} />
-            </ActionIcon>
-          </Tooltip>
+              {selectedRows.length === applicantData.length
+                ? "Deselect All"
+                : "Select All"}
+            </Button>
 
-          <Tooltip label="Download" withArrow>
-            <ActionIcon color="#718096" variant="transparent">
-              <IconDownload size={20} />
-            </ActionIcon>
-          </Tooltip>
+            <Group gap="xs" wrap="nowrap">
+              <Tooltip label="Bookmark" withArrow>
+                <ActionIcon
+                  color="#718096"
+                  variant="transparent"
+                  onClick={handleSavedApplicants}
+                >
+                  <IconBookmark size={20} />
+                </ActionIcon>
+              </Tooltip>
 
-          <Tooltip label="Archive" withArrow>
-            <ActionIcon
-              color="#718096"
-              variant="transparent"
-              onClick={handleArchive}
-            >
-              <IconArchive size={20} />
-            </ActionIcon>
-          </Tooltip>
+              <Tooltip label="Download" withArrow>
+                <ActionIcon color="#718096" variant="transparent">
+                  <IconDownload size={20} />
+                </ActionIcon>
+              </Tooltip>
 
-          <Tooltip label="Mail" withArrow>
-            <ActionIcon
-              color="#718096"
-              variant="transparent"
-              // onClick={handleSendEmails}
-              onClick={handleEmailClick}
-            >
-              <IconMail size={20} />
-            </ActionIcon>
-          </Tooltip>
+              <Tooltip label="Archive" withArrow>
+                <ActionIcon
+                  color="#718096"
+                  variant="transparent"
+                  onClick={handleArchive}
+                >
+                  <IconArchive size={20} />
+                </ActionIcon>
+              </Tooltip>
+
+              <Tooltip label="Mail" withArrow>
+                <ActionIcon
+                  color="#718096"
+                  variant="transparent"
+                  onClick={handleEmailClick}
+                >
+                  <IconMail size={20} />
+                </ActionIcon>
+              </Tooltip>
+            </Group>
+          </Group>
         </Group>
       </div>
+
       <div
         style={{
           width: "100%",
@@ -1193,6 +1229,7 @@ const Applicants = ({ data }: ApplicantsProps) => {
                   backgroundColor: "#F8FAFC",
                   borderRadius: "8px",
                   border: "1px solid #EAF4FF",
+                  whiteSpace: "nowrap",
                 }}
               >
                 <Table.Thead bg={"#EAF4FF"} c="#004A93">
@@ -1214,6 +1251,7 @@ const Applicants = ({ data }: ApplicantsProps) => {
                   backgroundColor: "#F8FAFC",
                   borderRadius: "8px",
                   border: "1px solid #EAF4FF",
+                  whiteSpace: "nowrap",
                 }}
               >
                 <Table.Thead bg={"#EAF4FF"} c="#004A93">

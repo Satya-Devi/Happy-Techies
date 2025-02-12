@@ -1,0 +1,39 @@
+.viewAllContainer {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  padding: 8px;
+  transition: all 0.3s ease;
+}
+
+.viewAllContainer:hover {
+  transform: translateX(5px);
+}
+
+.viewAllText {
+  font-size: clamp(1rem, 1.5vw, 1.25rem);
+  font-weight: 600;
+  color: #00000099;
+}
+
+.viewAllArrow {
+  width: clamp(12px, 2vw, 16px);
+  height: auto;
+}
+
+@media (max-width: 768px) {
+  .viewAllContainer {
+    gap: 8px;
+    padding: 6px;
+  }
+}
+
+@media (max-width: 480px) {
+  .viewAllContainer {
+    gap: 6px;
+    padding: 4px;
+  }
+}
