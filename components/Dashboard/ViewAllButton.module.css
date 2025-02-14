@@ -6,11 +6,6 @@
   gap: 10px;
   cursor: pointer;
   padding: 8px;
-  transition: all 0.3s ease;
-}
-
-.viewAllContainer:hover {
-  transform: translateX(5px);
 }
 
 .viewAllText {
@@ -22,6 +17,11 @@
 .viewAllArrow {
   width: clamp(12px, 2vw, 16px);
   height: auto;
+  transition: all 0.3s ease;
+}
+
+.viewAllContainer:hover .viewAllArrow {
+  transform: translateX(5px);
 }
 
 @media (max-width: 768px) {

@@ -26,7 +26,7 @@ import {
 import { DateInput } from "@mantine/dates";
 import { redirect, useRouter, useSearchParams } from "next/navigation";
 import { IconCheck, IconHelpCircle, IconEdit } from "@tabler/icons-react";
-
+import styles from "./Payment.module.css";
 import * as Yup from "yup";
 
 // Validation Schema using Yup
@@ -453,26 +453,9 @@ PaymentFormProps) =>
           </Box>
         </Modal>
 
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "start",
-            maxWidth: "100%",
-            gap: "12px",
-            flexDirection: window.innerWidth <= 768 ? "column" : "row",
-            padding: window.innerWidth <= 768 ? "1rem" : "0",
-          }}
-        >
+        <div className={styles.container}>
           {/* Summary Section */}
-          <div
-            style={{
-              backgroundColor: "white",
-              width: window.innerWidth <= 768 ? "100%" : "20%",
-              borderRadius: "8px",
-              padding: "1.5rem",
-            }}
-          >
+          <div className={styles.summarySection}>
             {action === "payment" ? (
               <>
                 <div
@@ -620,14 +603,7 @@ PaymentFormProps) =>
           </div>
 
           {/* Payment Form */}
-          <div
-            style={{
-              width: window.innerWidth <= 768 ? "100%" : "70%",
-              backgroundColor: "#F7FAFC",
-              borderRadius: "8px",
-              padding: window.innerWidth <= 768 ? "1rem" : "2rem",
-            }}
-          >
+          <div className={styles.formSection}>
             <form>
               <Grid gutter={20}>
                 {/* Employer's Name */}
