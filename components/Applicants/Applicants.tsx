@@ -331,30 +331,43 @@ const Applicants = ({ data }: ApplicantsProps) => {
   //     color: "green",
   //   });
   // };
-
   const handleSendEmail = async (emailData: {
     subject: string;
     message: string;
   }) => {
-    const response = await fetch("/api/send-email", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        recipients: validApplicants,
-        subject: emailData.subject,
-        message: emailData.message,
-        jobTitle: data.job_title,
-      }),
-    });
+    try {
+      const response = await fetch("/api/send-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          recipients: validApplicants,
+          subject: emailData.subject,
+          message: emailData.message,
+          jobTitle: data.job_title,
+        }),
+      });
 
-    const result = await response.json();
-    if (result.success) {
+      const result = await response.json();
+      if (!response.ok) {
+        throw new Error(result.error || "Failed to send emails");
+      }
+
       setEmailModalOpened(false);
+      setValidApplicants([]);
+      setSelectedRows([]);
       notifications.show({
         title: "Success",
         message: `Emails sent to ${validApplicants.length} applicants`,
         color: "green",
       });
+    } catch (error) {
+      notifications.show({
+        title: "Error",
+        message: "Failed to send emails. Please try again.",
+        color: "red",
+      });
+      // Keep modal open with entered data
+      return false; // Prevent modal from closing
     }
   };
 
